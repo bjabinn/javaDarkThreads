@@ -1,0 +1,122 @@
+{
+  "dashboard": {
+    "title": "Threads vs Virtual Threads - Comparación",
+    "tags": ["java", "threads", "performance"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Threads Activos",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+        "targets": [
+          {
+            "expr": "jvm_threads_live_threads{thread_type=\"platform\"}",
+            "legendFormat": "Platform Threads",
+            "refId": "A"
+          },
+          {
+            "expr": "jvm_threads_live_threads{thread_type=\"virtual\"}",
+            "legendFormat": "Virtual Threads",
+            "refId": "B"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Uso de CPU",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+        "targets": [
+          {
+            "expr": "process_cpu_usage{thread_type=\"platform\"}",
+            "legendFormat": "Platform Threads CPU",
+            "refId": "A"
+          },
+          {
+            "expr": "process_cpu_usage{thread_type=\"virtual\"}",
+            "legendFormat": "Virtual Threads CPU",
+            "refId": "B"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Uso de Memoria Heap",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+        "targets": [
+          {
+            "expr": "jvm_memory_used_bytes{area=\"heap\",thread_type=\"platform\"}",
+            "legendFormat": "Platform Threads Heap",
+            "refId": "A"
+          },
+          {
+            "expr": "jvm_memory_used_bytes{area=\"heap\",thread_type=\"virtual\"}",
+            "legendFormat": "Virtual Threads Heap",
+            "refId": "B"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Throughput (Requests/sec)",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+        "targets": [
+          {
+            "expr": "rate(http_server_requests_seconds_count{thread_type=\"platform\"}[1m])",
+            "legendFormat": "Platform Threads",
+            "refId": "A"
+          },
+          {
+            "expr": "rate(http_server_requests_seconds_count{thread_type=\"virtual\"}[1m])",
+            "legendFormat": "Virtual Threads",
+            "refId": "B"
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "title": "Latencia P95",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16},
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(http_server_requests_seconds_bucket{thread_type=\"platform\"}[5m]))",
+            "legendFormat": "Platform Threads P95",
+            "refId": "A"
+          },
+          {
+            "expr": "histogram_quantile(0.95, rate(http_server_requests_seconds_bucket{thread_type=\"virtual\"}[5m]))",
+            "legendFormat": "Virtual Threads P95",
+            "refId": "B"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Garbage Collection",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16},
+        "targets": [
+          {
+            "expr": "rate(jvm_gc_pause_seconds_sum{thread_type=\"platform\"}[1m])",
+            "legendFormat": "Platform Threads GC",
+            "refId": "A"
+          },
+          {
+            "expr": "rate(jvm_gc_pause_seconds_sum{thread_type=\"virtual\"}[1m])",
+            "legendFormat": "Virtual Threads GC",
+            "refId": "B"
+          }
+        ]
+      }
+    ],
+    "time": {"from": "now-1h", "to": "now"},
+    "timepicker": {},
+    "refresh": "5s",
+    "schemaVersion": 16,
+    "version": 1
+  }
+}

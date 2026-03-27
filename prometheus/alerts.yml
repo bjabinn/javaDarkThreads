@@ -1,0 +1,58 @@
+groups:
+  - name: java_performance_alerts
+    interval: 30s
+    rules:
+      # Alerta por alto uso de CPU
+      - alert: HighCPUUsage
+        expr: process_cpu_usage > 0.8
+        for: 2m
+        labels:
+          severity: warning
+          component: java-app
+        annotations:
+          summary: "Alto uso de CPU en {{ $labels.app }}"
+          description: "La aplicación {{ $labels.app }} está usando más del 80% de CPU por más de 2 minutos. Thread type: {{ $labels.thread_type }}"
+
+      # Alerta por alto uso de memoria
+      - alert: HighMemoryUsage
+        expr: (jvm_memory_used_bytes{area="heap"} / jvm_memory_max_bytes{area="heap"}) > 0.85
+        for: 2m
+        labels:
+          severity: warning
+          component: java-app
+        annotations:
+          summary: "Alto uso de memoria en {{ $labels.app }}"
+          description: "La aplicación {{ $labels.app }} está usando más del 85% de heap. Thread type: {{ $labels.thread_type }}"
+
+      # Alerta por alta latencia
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(http_server_requests_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+          component: java-app
+        annotations:
+          summary: "Alta latencia en {{ $labels.app }}"
+          description: "El percentil 95 de latencia en {{ $labels.app }} está por encima de 1 segundo. Thread type: {{ $labels.thread_type }}"
+
+      # Alerta por muchos threads activos (solo para platform threads)
+      - alert: TooManyThreads
+        expr: jvm_threads_live_threads{thread_type="platform"} > 200
+        for: 5m
+        labels:
+          severity: info
+          component: java-app
+        annotations:
+          summary: "Número elevado de threads en {{ $labels.app }}"
+          description: "La aplicación {{ $labels.app }} tiene más de 200 threads activos."
+
+      # Alerta por tasa alta de GC
+      - alert: HighGCRate
+        expr: rate(jvm_gc_pause_seconds_sum[1m]) > 0.1
+        for: 2m
+        labels:
+          severity: warning
+          component: java-app
+        annotations:
+          summary: "Alta tasa de GC en {{ $labels.app }}"
+          description: "La aplicación {{ $labels.app }} está gastando más del 10% del tiempo en GC."

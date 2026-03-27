@@ -1,0 +1,39 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    monitor: 'poc-threads-monitor'
+    environment: 'development'
+
+# Cargar reglas de alertas
+rule_files:
+  - 'alerts.yml'
+
+# Configuración de scraping
+scrape_configs:
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+        labels:
+          service: 'prometheus'
+
+  # Aplicación Java - Platform Threads
+  - job_name: 'platform-threads-app'
+    static_configs:
+      - targets: ['host.docker.internal:8080']
+        labels:
+          thread_type: 'platform'
+          app: 'platform-threads-poc'
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 5s
+
+  # PostgreSQL (si usas postgres_exporter)
+  # - job_name: 'postgres'
+  #   static_configs:
+  #     - targets: ['postgres-exporter:9187']
+
+  # Kafka JMX Exporter (si decides agregarlo)
+  # - job_name: 'kafka'
+  #   static_configs:
+  #     - targets: ['kafka-exporter:9308']
