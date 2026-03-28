@@ -10,14 +10,13 @@ USER root
 # Crear directorios necesarios
 RUN mkdir -p /etc/grafana/provisioning/datasources && \
     mkdir -p /etc/grafana/provisioning/dashboards && \
-    mkdir -p /var/lib/grafana/dashboards && \
-    chown -R grafana:grafana /etc/grafana && \
-    chown -R grafana:grafana /var/lib/grafana
+    mkdir -p /var/lib/grafana/dashboards
 
 # Copiar configuraciones
 COPY datasources.yml /etc/grafana/provisioning/datasources/
 COPY dashboards.yml /etc/grafana/provisioning/dashboards/
 COPY dashboard-threads-comparison.json /var/lib/grafana/dashboards/
+COPY dashboard-jvm-monitoring.json /var/lib/grafana/dashboards/
 
 # Variables de entorno
 ENV GF_SECURITY_ADMIN_USER=admin \

@@ -20,4 +20,5 @@ echo "================================================"
 echo ""
 
 # Ejecutar la aplicación con Maven
-./mvnw spring-boot:run
+# --enable-native-access=ALL-UNNAMED: Suprime warnings de acceso nativo en Java 21+
+./mvnw spring-boot:run -Dspring-boot.run.jvmArguments="--enable-native-access=ALL-UNNAMED"

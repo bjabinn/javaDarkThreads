@@ -10,11 +10,15 @@ if docker ps -a --format '{{.Names}}' | grep -q '^grafana$'; then
     docker rm -f grafana
 fi
 
-# Ejecutar contenedor
+# Crear volumen si no existe
+docker volume create grafana-data 2>/dev/null || true
+
+# Ejecutar contenedor con volumen persistente
 docker run -d \
     --name grafana \
     --network app-network \
     -p 3000:3000 \
+    -v grafana-data:/var/lib/grafana \
     --restart unless-stopped \
     poc-grafana:latest
 

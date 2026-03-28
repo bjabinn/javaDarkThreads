@@ -1,6 +1,7 @@
 {
-  "dashboard": {
-    "title": "Threads vs Virtual Threads - Comparación",
+  "uid": "threads-comparison",
+  "title": "Threads vs Virtual Threads - Comparación",
+  "editable": true,
     "tags": ["java", "threads", "performance"],
     "timezone": "browser",
     "panels": [
@@ -118,5 +119,4 @@
     "refresh": "5s",
     "schemaVersion": 16,
     "version": 1
-  }
 }

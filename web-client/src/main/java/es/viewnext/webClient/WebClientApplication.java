@@ -9,7 +9,7 @@ import org.springframework.context.annotation.ComponentScan;
 public class WebClientApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(Scaffolding1Application.class, args);
+		SpringApplication.run(WebClientApplication.class, args);
 	}
 
 }
