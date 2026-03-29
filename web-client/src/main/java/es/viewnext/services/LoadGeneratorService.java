@@ -7,7 +7,10 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -28,9 +31,11 @@ public class LoadGeneratorService {
     private final Counter failureCounter;
     private final Timer requestTimer;
     private final MeterRegistry meterRegistry;
+    private final RestTemplate restTemplate;
     
-    public LoadGeneratorService(MeterRegistry meterRegistry) {
+    public LoadGeneratorService(MeterRegistry meterRegistry, RestTemplate restTemplate) {
         this.meterRegistry = meterRegistry;
+        this.restTemplate = restTemplate;
         this.requestCounter = Counter.builder("load.requests.total")
                 .description("Total number of load test requests")
                 .tag("thread_type", "platform")
@@ -152,19 +157,37 @@ public class LoadGeneratorService {
                 // Increment request counter
                 requestCounter.increment();
                 
-                // Simulate blocking I/O operation
-                if (delayMs > 0) {
-                    Thread.sleep(delayMs);
-                }
-                
-                // If targetUrl is provided, make HTTP call (simplified for now)
+                // If targetUrl is provided, make real HTTP call
                 if (targetUrl != null && !targetUrl.isEmpty()) {
-                    // In a real scenario, you would make an actual HTTP call here
-                    logger.debug("Request #{} would call: {}", requestNum, targetUrl);
+                    try {
+                        // Make actual HTTP GET request using platform threads (blocking I/O)
+                        ResponseEntity<String> response = restTemplate.getForEntity(targetUrl, String.class);
+                        
+                        if (response.getStatusCode().is2xxSuccessful()) {
+                            successCount.incrementAndGet();
+                            successCounter.increment();
+                            logger.debug("Request #{} received HTTP {} from {}", 
+                                       requestNum, response.getStatusCode(), targetUrl);
+                        } else {
+                            failureCount.incrementAndGet();
+                            failureCounter.increment();
+                            logger.warn("Request #{} received non-2xx HTTP {} from {}", 
+                                      requestNum, response.getStatusCode(), targetUrl);
+                        }
+                    } catch (RestClientException e) {
+                        failureCount.incrementAndGet();
+                        failureCounter.increment();
+                        logger.error("Request #{} failed to call: {}", requestNum, targetUrl, e);
+                        throw e; // Re-throw to be caught by outer catch block
+                    }
+                } else {
+                    // No URL provided, just simulate delay
+                    if (delayMs > 0) {
+                        Thread.sleep(delayMs);
+                    }
+                    successCount.incrementAndGet();
+                    successCounter.increment();
                 }
-                
-                successCount.incrementAndGet();
-                successCounter.increment();
                 
                 long duration = (System.nanoTime() - start) / 1_000_000; // convert to ms
                 logger.debug("Request #{} completed in {} ms", requestNum, duration);
