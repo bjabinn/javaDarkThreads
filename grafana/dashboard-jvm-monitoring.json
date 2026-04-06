@@ -222,6 +222,29 @@
           {"format": "reqps", "label": "Requests/sec"},
           {"format": "short"}
         ]
+      },
+      {
+        "id": 9,
+        "title": "Process Resident Memory (RSS)",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 32},
+        "targets": [
+          {
+            "expr": "process_resident_memory_bytes{app=\"web-server\"}",
+            "legendFormat": "web-server - RSS Memory",
+            "refId": "A"
+          },
+          {
+            "expr": "process_resident_memory_bytes{app=\"web-client\"}",
+            "legendFormat": "web-client - RSS Memory",
+            "refId": "B"
+          }
+        ],
+        "yaxes": [
+          {"format": "bytes", "label": "Memory"},
+          {"format": "short"}
+        ],
+        "description": "Resident Set Size (RSS) - Physical memory used by the process"
       }
     ],
     "time": {"from": "now-1h", "to": "now"},
@@ -230,5 +253,5 @@
     },
     "refresh": "2s",
     "schemaVersion": 16,
-    "version": 1
+    "version": 2
 }
