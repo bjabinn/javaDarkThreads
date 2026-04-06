@@ -1,9 +1,9 @@
 spring:
   application:
-    name: platform-threads-poc
+    name: web-client-reactive
 
 server:
-  port: 8080
+  port: 8090
 
 # Actuator configuration
 management:
@@ -23,7 +23,7 @@ management:
         enabled: true
     tags:
       application: ${spring.application.name}
-      thread_type: platform
+      thread_type: virtual
     distribution:
       percentiles-histogram:
         http.server.requests: true

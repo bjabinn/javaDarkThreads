@@ -1,0 +1,357 @@
+{
+  "uid": "jvm-threads-blocking",
+  "title": "Monitoreo JVM y Comparación de Hilos - Versiones Bloqueantes",
+  "tags": ["java", "jvm", "metrics", "monitoring", "threads", "performance", "blocking"],
+  "timezone": "browser",
+  "editable": true,
+  "panels": [
+    {
+      "id": 1,
+      "title": "Memoria Heap Utilizada",
+      "type": "graph",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+      "targets": [
+        {
+          "expr": "jvm_memory_used_bytes{area=\"heap\",app=\"web-server-blocking\"}",
+          "legendFormat": "web-server-blocking - Heap Utilizada",
+          "refId": "A"
+        },
+        {
+          "expr": "jvm_memory_used_bytes{area=\"heap\",app=\"web-client-blocking\"}",
+          "legendFormat": "web-client-blocking - Heap Utilizada",
+          "refId": "B"
+        }
+      ],
+      "yaxes": [
+        {"format": "bytes", "label": "Memoria"},
+        {"format": "short"}
+      ],
+      "description": "Memoria heap utilizada por las aplicaciones bloqueantes (platform threads)"
+    },
+    {
+      "id": 2,
+      "title": "Memoria Heap Máxima",
+      "type": "graph",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+      "targets": [
+        {
+          "expr": "jvm_memory_max_bytes{area=\"heap\",app=\"web-server-blocking\"}",
+          "legendFormat": "web-server-blocking - Heap Máxima",
+          "refId": "A"
+        },
+        {
+          "expr": "jvm_memory_max_bytes{area=\"heap\",app=\"web-client-blocking\"}",
+          "legendFormat": "web-client-blocking - Heap Máxima",
+          "refId": "B"
+        }
+      ],
+      "yaxes": [
+        {"format": "bytes", "label": "Memoria"},
+        {"format": "short"}
+      ],
+      "description": "Memoria heap máxima configurada"
+    },
+    {
+      "id": 3,
+      "title": "Porcentaje de Uso de Heap",
+      "type": "graph",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+      "targets": [
+        {
+          "expr": "(jvm_memory_used_bytes{area=\"heap\",app=\"web-server-blocking\"} / jvm_memory_max_bytes{area=\"heap\",app=\"web-server-blocking\"}) * 100",
+          "legendFormat": "web-server-blocking - Uso de Heap %",
+          "refId": "A"
+        },
+        {
+          "expr": "(jvm_memory_used_bytes{area=\"heap\",app=\"web-client-blocking\"} / jvm_memory_max_bytes{area=\"heap\",app=\"web-client-blocking\"}) * 100",
+          "legendFormat": "web-client-blocking - Uso de Heap %",
+          "refId": "B"
+        }
+      ],
+      "yaxes": [
+        {"format": "percent", "label": "Uso", "max": 100, "min": 0},
+        {"format": "short"}
+      ],
+      "alert": {
+        "conditions": [
+          {
+            "evaluator": {"params": [85], "type": "gt"},
+            "operator": {"type": "and"},
+            "query": {"params": ["A", "5m", "now"]},
+            "reducer": {"params": [], "type": "avg"},
+            "type": "query"
+          }
+        ],
+        "name": "Alerta de Uso Alto de Heap"
+      },
+      "description": "Porcentaje de uso de memoria heap. Alerta cuando supera el 85%"
+    },
+    {
+      "id": 4,
+      "title": "Memoria RSS del Proceso",
+      "type": "graph",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+      "targets": [
+        {
+          "expr": "process_resident_memory_bytes{app=\"web-server-blocking\"}",
+          "legendFormat": "web-server-blocking - Memoria RSS",
+          "refId": "A"
+        },
+        {
+          "expr": "process_resident_memory_bytes{app=\"web-client-blocking\"}",
+          "legendFormat": "web-client-blocking - Memoria RSS",
+          "refId": "B"
+        }
+      ],
+      "yaxes": [
+        {"format": "bytes", "label": "Memoria"},
+        {"format": "short"}
+      ],
+      "description": "Resident Set Size (RSS) - Memoria física utilizada por el proceso"
+    },
+    {
+      "id": 5,
+      "title": "Hilos Vivos por Aplicación",
+      "type": "graph",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16},
+      "targets": [
+        {
+          "expr": "jvm_threads_live_threads{app=\"web-server-blocking\"}",
+          "legendFormat": "web-server-blocking - Hilos Vivos",
+          "refId": "A"
+        },
+        {
+          "expr": "jvm_threads_live_threads{app=\"web-client-blocking\"}",
+          "legendFormat": "web-client-blocking - Hilos Vivos",
+          "refId": "B"
+        }
+      ],
+      "yaxes": [
+        {"format": "short", "label": "Hilos"},
+        {"format": "short"}
+      ],
+      "description": "Total de hilos de plataforma vivos por aplicación"
+    },
+    {
+      "id": 6,
+      "title": "Hilos Daemon",
+      "type": "graph",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16},
+      "targets": [
+        {
+          "expr": "jvm_threads_daemon_threads{app=\"web-server-blocking\"}",
+          "legendFormat": "web-server-blocking - Hilos Daemon",
+          "refId": "A"
+        },
+        {
+          "expr": "jvm_threads_daemon_threads{app=\"web-client-blocking\"}",
+          "legendFormat": "web-client-blocking - Hilos Daemon",
+          "refId": "B"
+        }
+      ],
+      "yaxes": [
+        {"format": "short", "label": "Hilos"},
+        {"format": "short"}
+      ],
+      "description": "Número de hilos daemon activos"
+    },
+    {
+      "id": 7,
+      "title": "Hilos por Estado",
+      "type": "graph",
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 24},
+      "targets": [
+        {
+          "expr": "jvm_threads_states_threads{app=\"web-server-blocking\",state=\"runnable\"}",
+          "legendFormat": "web-server-blocking - Ejecutable",
+          "refId": "A"
+        },
+        {
+          "expr": "jvm_threads_states_threads{app=\"web-server-blocking\",state=\"blocked\"}",
+          "legendFormat": "web-server-blocking - Bloqueado",
+          "refId": "B"
+        },
+        {
+          "expr": "jvm_threads_states_threads{app=\"web-server-blocking\",state=\"waiting\"}",
+          "legendFormat": "web-server-blocking - Esperando",
+          "refId": "C"
+        },
+        {
+          "expr": "jvm_threads_states_threads{app=\"web-server-blocking\",state=\"timed-waiting\"}",
+          "legendFormat": "web-server-blocking - Esperando con Tiempo",
+          "refId": "D"
+        },
+        {
+          "expr": "jvm_threads_states_threads{app=\"web-client-blocking\",state=\"runnable\"}",
+          "legendFormat": "web-client-blocking - Ejecutable",
+          "refId": "E"
+        },
+        {
+          "expr": "jvm_threads_states_threads{app=\"web-client-blocking\",state=\"blocked\"}",
+          "legendFormat": "web-client-blocking - Bloqueado",
+          "refId": "F"
+        },
+        {
+          "expr": "jvm_threads_states_threads{app=\"web-client-blocking\",state=\"waiting\"}",
+          "legendFormat": "web-client-blocking - Esperando",
+          "refId": "G"
+        },
+        {
+          "expr": "jvm_threads_states_threads{app=\"web-client-blocking\",state=\"timed-waiting\"}",
+          "legendFormat": "web-client-blocking - Esperando con Tiempo",
+          "refId": "H"
+        }
+      ],
+      "yaxes": [
+        {"format": "short", "label": "Hilos"},
+        {"format": "short"}
+      ],
+      "description": "Distribución de hilos de plataforma por estado (ejecutable, bloqueado, esperando)"
+    },
+    {
+      "id": 8,
+      "title": "Uso de CPU por Aplicación",
+      "type": "graph",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 32},
+      "targets": [
+        {
+          "expr": "process_cpu_usage{app=\"web-server-blocking\"}",
+          "legendFormat": "web-server-blocking - Uso de CPU",
+          "refId": "A"
+        },
+        {
+          "expr": "process_cpu_usage{app=\"web-client-blocking\"}",
+          "legendFormat": "web-client-blocking - Uso de CPU",
+          "refId": "B"
+        }
+      ],
+      "yaxes": [
+        {"format": "percentunit", "label": "CPU", "max": 1, "min": 0},
+        {"format": "short"}
+      ],
+      "description": "Porcentaje de uso de CPU por aplicación"
+    },
+    {
+      "id": 9,
+      "title": "Tiempo de CPU del Sistema",
+      "type": "graph",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 32},
+      "targets": [
+        {
+          "expr": "system_cpu_usage{app=\"web-server-blocking\"}",
+          "legendFormat": "web-server-blocking - CPU Sistema",
+          "refId": "A"
+        },
+        {
+          "expr": "system_cpu_usage{app=\"web-client-blocking\"}",
+          "legendFormat": "web-client-blocking - CPU Sistema",
+          "refId": "B"
+        }
+      ],
+      "yaxes": [
+        {"format": "percentunit", "label": "CPU", "max": 1, "min": 0},
+        {"format": "short"}
+      ],
+      "description": "Uso de CPU del sistema operativo"
+    },
+    {
+      "id": 10,
+      "title": "Throughput HTTP (Peticiones/seg)",
+      "type": "graph",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 40},
+      "targets": [
+        {
+          "expr": "rate(http_server_requests_seconds_count{app=\"web-server-blocking\"}[1m])",
+          "legendFormat": "web-server-blocking - Peticiones/seg",
+          "refId": "A"
+        },
+        {
+          "expr": "rate(http_server_requests_seconds_count{app=\"web-client-blocking\"}[1m])",
+          "legendFormat": "web-client-blocking - Peticiones/seg",
+          "refId": "B"
+        }
+      ],
+      "yaxes": [
+        {"format": "reqps", "label": "Peticiones/seg"},
+        {"format": "short"}
+      ],
+      "description": "Tasa de peticiones HTTP procesadas por segundo"
+    },
+    {
+      "id": 11,
+      "title": "Latencia Media de Respuesta HTTP",
+      "type": "graph",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 40},
+      "targets": [
+        {
+          "expr": "rate(http_server_requests_seconds_sum{app=\"web-server-blocking\"}[1m]) / rate(http_server_requests_seconds_count{app=\"web-server-blocking\"}[1m])",
+          "legendFormat": "web-server-blocking - Latencia Media",
+          "refId": "A"
+        },
+        {
+          "expr": "rate(http_server_requests_seconds_sum{app=\"web-client-blocking\"}[1m]) / rate(http_server_requests_seconds_count{app=\"web-client-blocking\"}[1m])",
+          "legendFormat": "web-client-blocking - Latencia Media",
+          "refId": "B"
+        }
+      ],
+      "yaxes": [
+        {"format": "s", "label": "Latencia"},
+        {"format": "short"}
+      ],
+      "description": "Latencia media de respuesta HTTP"
+    },
+    {
+      "id": 12,
+      "title": "Tasa de Garbage Collection",
+      "type": "graph",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 48},
+      "targets": [
+        {
+          "expr": "rate(jvm_gc_pause_seconds_sum{app=\"web-server-blocking\"}[1m])",
+          "legendFormat": "web-server-blocking - Tasa de GC",
+          "refId": "A"
+        },
+        {
+          "expr": "rate(jvm_gc_pause_seconds_sum{app=\"web-client-blocking\"}[1m])",
+          "legendFormat": "web-client-blocking - Tasa de GC",
+          "refId": "B"
+        }
+      ],
+      "yaxes": [
+        {"format": "s", "label": "Tiempo de GC"},
+        {"format": "short"}
+      ],
+      "description": "Tasa de tiempo consumido por el Garbage Collector"
+    },
+    {
+      "id": 13,
+      "title": "Conteo de Recolecciones de Basura",
+      "type": "graph",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 48},
+      "targets": [
+        {
+          "expr": "rate(jvm_gc_pause_seconds_count{app=\"web-server-blocking\"}[1m])",
+          "legendFormat": "web-server-blocking - Recolecciones/seg",
+          "refId": "A"
+        },
+        {
+          "expr": "rate(jvm_gc_pause_seconds_count{app=\"web-client-blocking\"}[1m])",
+          "legendFormat": "web-client-blocking - Recolecciones/seg",
+          "refId": "B"
+        }
+      ],
+      "yaxes": [
+        {"format": "ops", "label": "GC/seg"},
+        {"format": "short"}
+      ],
+      "description": "Frecuencia de ejecuciones del Garbage Collector por segundo"
+    }
+  ],
+  "time": {"from": "now-1h", "to": "now"},
+  "timepicker": {
+    "refresh_intervals": ["5s", "10s", "30s", "1m", "5m", "15m"]
+  },
+  "refresh": "5s",
+  "schemaVersion": 16,
+  "version": 1
+}

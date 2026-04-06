@@ -1,6 +1,6 @@
 spring:
   application:
-    name: platform-threads-poc
+    name: web-client-blocking
 
 server:
   port: 8080

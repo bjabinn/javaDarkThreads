@@ -1,9 +1,9 @@
 spring:
   application:
-    name: web-server
+    name: web-server-reactive
 
 server:
-  port: 8081
+  port: 8091
 
 # Actuator configuration
 management:

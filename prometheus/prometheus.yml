@@ -18,24 +18,24 @@ scrape_configs:
         labels:
           service: 'prometheus'
 
-  # Aplicación Java - Web Client (Platform Threads)
-  - job_name: 'web-client'
+  # Aplicación Java - Web Client Blocking (Platform Threads)
+  - job_name: 'web-client-blocking'
     static_configs:
       - targets: ['host.docker.internal:8080']
         labels:
           thread_type: 'platform'
-          app: 'web-client'
-          service: 'platform-threads-poc'
+          app: 'web-client-blocking'
+          service: 'web-client-blocking'
     metrics_path: '/actuator/prometheus'
     scrape_interval: 2s
 
-  # Aplicación Java - Web Server
-  - job_name: 'web-server'
+  # Aplicación Java - Web Server Blocking
+  - job_name: 'web-server-blocking'
     static_configs:
       - targets: ['host.docker.internal:8081']
         labels:
-          app: 'web-server'
-          service: 'web-server'
+          app: 'web-server-blocking'
+          service: 'web-server-blocking'
     metrics_path: '/actuator/prometheus'
     scrape_interval: 2s
 

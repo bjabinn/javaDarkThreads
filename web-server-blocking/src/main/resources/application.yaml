@@ -1,6 +1,6 @@
 spring:
   application:
-    name: web-server
+    name: web-server-blocking
 
 server:
   port: 8081
