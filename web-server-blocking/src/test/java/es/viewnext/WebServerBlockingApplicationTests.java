@@ -1,9 +1,9 @@
-package es.viewnext.scaffolding1;
+package es.viewnext;
 
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class Scaffolding1ApplicationTests {
+class WebServerBlockingApplicationTests {
 
 	// @Test
 	// void contextLoads() {
