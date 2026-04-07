@@ -27,7 +27,7 @@ scrape_configs:
           app: 'web-client-blocking'
           service: 'web-client-blocking'
     metrics_path: '/actuator/prometheus'
-    scrape_interval: 2s
+    scrape_interval: 1s
 
   # Aplicación Java - Web Server Blocking
   - job_name: 'web-server-blocking'
@@ -37,7 +37,28 @@ scrape_configs:
           app: 'web-server-blocking'
           service: 'web-server-blocking'
     metrics_path: '/actuator/prometheus'
-    scrape_interval: 2s
+    scrape_interval: 1s
+
+  # Aplicación Java - Web Client Reactive (Virtual Threads)
+  - job_name: 'web-client-reactive'
+    static_configs:
+      - targets: ['host.docker.internal:8090']
+        labels:
+          thread_type: 'virtual'
+          app: 'web-client-reactive'
+          service: 'web-client-reactive'
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 1s
+
+  # Aplicación Java - Web Server Reactive
+  - job_name: 'web-server-reactive'
+    static_configs:
+      - targets: ['host.docker.internal:8091']
+        labels:
+          app: 'web-server-reactive'
+          service: 'web-server-reactive'
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 1s
 
   # PostgreSQL (si usas postgres_exporter)
   # - job_name: 'postgres'

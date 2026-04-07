@@ -2,25 +2,28 @@
 
 # Script maestro para iniciar todos los servicios
 
+# Obtener el directorio donde está este script
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
 echo "🚀 Iniciando todos los servicios..."
 echo "================================================"
 echo ""
 
 # Crear red si no existe
-./scripts/01-create-network.sh
+"$SCRIPT_DIR/01-create-network.sh"
 echo ""
 
 # Iniciar servicios de infraestructura primero
-./scripts/12-run-prometheus.sh
+"$SCRIPT_DIR/12-run-prometheus.sh"
 echo ""
 
-./scripts/13-run-grafana.sh
+"$SCRIPT_DIR/13-run-grafana.sh"
 echo ""
 
 # Opcional: PostgreSQL y Kafka (descomentados si los necesitas)
-# ./scripts/10-run-postgres.sh
+# "$SCRIPT_DIR/10-run-postgres.sh"
 # echo ""
-# ./scripts/11-run-kafka.sh
+# "$SCRIPT_DIR/11-run-kafka.sh"
 # echo ""
 
 echo "================================================"
