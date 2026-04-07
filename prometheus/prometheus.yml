@@ -39,12 +39,12 @@ scrape_configs:
     metrics_path: '/actuator/prometheus'
     scrape_interval: 1s
 
-  # Aplicación Java - Web Client Reactive (Virtual Threads)
+  # Aplicación Java - Web Client Reactive
   - job_name: 'web-client-reactive'
     static_configs:
       - targets: ['host.docker.internal:8090']
         labels:
-          thread_type: 'virtual'
+          thread_type: 'reactive'
           app: 'web-client-reactive'
           service: 'web-client-reactive'
     metrics_path: '/actuator/prometheus'
@@ -57,6 +57,27 @@ scrape_configs:
         labels:
           app: 'web-server-reactive'
           service: 'web-server-reactive'
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 1s
+
+  # Aplicación Java - Web Client Virtual Threads
+  - job_name: 'web-client-vt'
+    static_configs:
+      - targets: ['host.docker.internal:8095']
+        labels:
+          thread_type: 'virtual'
+          app: 'web-client-vt'
+          service: 'web-client-vt'
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 1s
+
+  # Aplicación Java - Web Server Virtual Threads
+  - job_name: 'web-server-vt'
+    static_configs:
+      - targets: ['host.docker.internal:8096']
+        labels:
+          app: 'web-server-vt'
+          service: 'web-server-vt'
     metrics_path: '/actuator/prometheus'
     scrape_interval: 1s
 
