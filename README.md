@@ -1,192 +1,250 @@
-# Docker Compose - Stack para PoC Threads vs Virtual Threads
+# PoC: Platform Threads vs Reactive vs Virtual Threads
 
-Stack completo con PostgreSQL, Kafka (KRaft), Prometheus y Grafana para pruebas de concepto.
+Comparativa práctica de los tres modelos de concurrencia en Java/Spring Boot, monitorizada con Prometheus y Grafana.
 
-## 📋 Servicios Incluidos
+---
 
-| Servicio   | Puerto | Credenciales        | Descripción                          |
-|------------|--------|---------------------|--------------------------------------|
-| PostgreSQL | 5432   | postgres/postgres   | Base de datos relacional             |
-| Kafka      | 9092   | N/A                 | Message broker (modo KRaft)          |
-| Prometheus | 9090   | N/A                 | Sistema de monitorización y alertas  |
-| Grafana    | 3000   | admin/admin         | Visualización de métricas            |
+## Arquitectura
 
-## 🚀 Inicio Rápido
+Cada modelo de concurrencia tiene dos aplicaciones: un **servidor** que simula trabajo con I/O y un **cliente generador de carga** que dispara peticiones concurrentes contra el servidor.
 
-### Levantar todos los servicios:
-```bash
-docker-compose up -d
+```text
+[web-client-*]  →  [web-server-*]  →  Prometheus  →  Grafana
 ```
 
-### Ver logs de todos los servicios:
+---
+
+## Aplicaciones Java
+
+### Platform Threads (Hilos de Plataforma)
+
+| Aplicación | Puerto | URL base | Descripción |
+| --- | --- | --- | --- |
+| web-client-blocking | 8080 | http://localhost:8080 | Generador de carga con hilos OS (RestTemplate + pool fijo) |
+| web-server-blocking | 8081 | http://localhost:8081 | Servidor con Spring MVC bloqueante |
+
+**Endpoints relevantes:**
+- `POST http://localhost:8080/api/load` — lanza carga contra web-server-blocking
+- `GET  http://localhost:8081/api/greeting` — endpoint del servidor
+- `GET  http://localhost:8080/swagger-ui/index.html` — Swagger UI cliente
+- `GET  http://localhost:8081/swagger-ui/index.html` — Swagger UI servidor
+- `GET  http://localhost:8080/actuator/prometheus` — métricas Prometheus cliente
+- `GET  http://localhost:8081/actuator/prometheus` — métricas Prometheus servidor
+
+---
+
+### Reactive (WebFlux + Project Reactor)
+
+| Aplicación | Puerto | URL base | Descripción |
+| --- | --- | --- | --- |
+| web-client-reactive | 8090 | http://localhost:8090 | Generador de carga reactivo (WebClient + Flux) |
+| web-server-reactive | 8091 | http://localhost:8091 | Servidor con Spring WebFlux no bloqueante |
+
+**Endpoints relevantes:**
+- `POST http://localhost:8090/api/load` — lanza carga contra web-server-reactive
+- `GET  http://localhost:8091/api/greeting-reactive` — endpoint del servidor (simula 2s de delay)
+- `GET  http://localhost:8090/swagger-ui/index.html` — Swagger UI cliente
+- `GET  http://localhost:8091/swagger-ui/index.html` — Swagger UI servidor
+- `GET  http://localhost:8090/actuator/prometheus` — métricas Prometheus cliente
+- `GET  http://localhost:8091/actuator/prometheus` — métricas Prometheus servidor
+
+---
+
+### Virtual Threads (Project Loom — Java 21+)
+
+| Aplicación | Puerto | URL base | Descripción |
+| --- | --- | --- | --- |
+| web-client-vt | 8095 | http://localhost:8095 | Generador de carga con virtual threads (RestTemplate + VirtualThreadPerTaskExecutor) |
+| web-server-vt | 8096 | http://localhost:8096 | Servidor con Spring MVC + `spring.threads.virtual.enabled=true` |
+
+**Endpoints relevantes:**
+- `POST http://localhost:8095/api/load` — lanza carga contra web-server-vt
+- `GET  http://localhost:8096/api/greeting` — endpoint del servidor
+- `GET  http://localhost:8095/swagger-ui/index.html` — Swagger UI cliente
+- `GET  http://localhost:8096/swagger-ui/index.html` — Swagger UI servidor
+- `GET  http://localhost:8095/actuator/prometheus` — métricas Prometheus cliente
+- `GET  http://localhost:8096/actuator/prometheus` — métricas Prometheus servidor
+
+### Arrancar las aplicaciones Java
+
+Cada aplicación tiene su propio `run.sh` en su directorio raíz:
+
 ```bash
-docker-compose logs -f
+# Platform Threads
+cd web-server-blocking && ./run.sh   # puerto 8081
+cd web-client-blocking && ./run.sh   # puerto 8080
+
+# Reactive
+cd web-server-reactive && ./run.sh   # puerto 8091
+cd web-client-reactive && ./run.sh   # puerto 8090
+
+# Virtual Threads
+cd web-server-vt && ./run.sh         # puerto 8096
+cd web-client-vt && ./run.sh         # puerto 8095
 ```
 
-### Ver logs de un servicio específico:
+Arranca primero el servidor y luego el cliente generador de carga de cada modelo.
+
+---
+
+## Infraestructura (Docker)
+
+| Servicio | Puerto | URL | Credenciales | Descripción |
+| --- | --- | --- | --- | --- |
+| Prometheus | 9090 | http://localhost:9090 | — | Scraping de métricas (1s por app Java) |
+| Grafana | 3000 | http://localhost:3000 | admin / admin | Dashboards de visualización |
+| PostgreSQL | 5432 | localhost:5432 | postgres / postgres | Base de datos relacional |
+| Kafka | 9092 | localhost:9092 | — | Message broker (modo KRaft, sin Zookeeper) |
+
+### Scripts disponibles
+
+Todos los scripts están en el directorio `scripts/`:
+
 ```bash
-docker-compose logs -f prometheus
+# 1. Construir imágenes Docker (Prometheus + Grafana)
+./scripts/build-containers.sh
+
+# 2. Arrancar la infraestructura (red + Prometheus + Grafana)
+./scripts/start-containers.sh
+
+# 3. Ver estado de contenedores e imágenes
+./scripts/status.sh
+
+# 4. Parar y eliminar todos los contenedores
+./scripts/stop-containers.sh
 ```
 
-### Parar todos los servicios:
-```bash
-docker-compose down
-```
+> PostgreSQL y Kafka están disponibles pero comentados en `start-containers.sh`. Descoméntalos si los necesitas.
 
-### Parar y eliminar volúmenes (reset completo):
-```bash
-docker-compose down -v
-```
+---
 
-## 🔍 Acceso a los Servicios
+## Prometheus
 
-### Grafana
-- URL: http://localhost:3000
-- Usuario: `admin`
-- Contraseña: `admin`
-- Prometheus ya viene preconfigurado como datasource
-
-### Prometheus
 - URL: http://localhost:9090
 - Targets: http://localhost:9090/targets
-- Query: http://localhost:9090/graph
+- Query explorer: http://localhost:9090/graph
 
-### PostgreSQL
+**Configuración de scraping:**
+- Intervalo global: 15s
+- Intervalo por app Java: **1s** (para capturar cambios rápidos bajo carga)
+
+**Jobs configurados:**
+
+| Job | Target | thread_type label |
+|---|---|---|
+| web-client-blocking | host.docker.internal:8080 | platform |
+| web-server-blocking | host.docker.internal:8081 | — |
+| web-client-reactive | host.docker.internal:8090 | reactive |
+| web-server-reactive | host.docker.internal:8091 | — |
+| web-client-vt | host.docker.internal:8095 | virtual |
+| web-server-vt | host.docker.internal:8096 | — |
+
+---
+
+## Grafana
+
+- URL: http://localhost:3000
+- Usuario: `admin` / Contraseña: `admin`
+- Datasource: Prometheus (preconfigurado)
+- Refresco: 5s | Ventana por defecto: última hora
+
+### Dashboards disponibles
+
+| Dashboard | Archivo | Aplicaciones monitorizadas |
+|---|---|---|
+| Platform Threads | `grafana/dashboard-blocking.json` | web-server-blocking, web-client-blocking |
+| Reactive | `grafana/dashboard-reactive.json` | web-server-reactive, web-client-reactive |
+| Virtual Threads | `grafana/dashboard-vt.json` | web-server-vt, web-client-vt |
+
+### Paneles en cada dashboard (16 paneles)
+
+| # | Panel | Métrica clave |
+|---|---|---|
+| 1 | Memoria Heap Utilizada | `jvm_memory_used_bytes{area="heap"}` |
+| 2 | Memoria Heap Máxima | `jvm_memory_max_bytes{area="heap"}` |
+| 3 | % Uso de Heap (alerta >85%) | heap_used / heap_max * 100 |
+| 4 | Memoria RSS del Proceso | `process_resident_memory_bytes` |
+| 5 | Hilos Vivos | `jvm_threads_live_threads` |
+| 6 | Hilos Daemon | `jvm_threads_daemon_threads` |
+| 7 | Hilos por Estado | `jvm_threads_states_threads{state}` |
+| 8 | CPU del Proceso | `process_cpu_usage` |
+| 9 | CPU del Sistema | `system_cpu_usage` |
+| 10 | Throughput HTTP (req/s) | `rate(http_server_requests_seconds_count[1m])` |
+| 11 | Latencia Media HTTP | sum/count rate |
+| 12 | Tasa de GC | `rate(jvm_gc_pause_seconds_sum[1m])` |
+| 13 | Frecuencia de GC | `rate(jvm_gc_pause_seconds_count[1m])` |
+| 14 | Latencia P95 | `histogram_quantile(0.95, rate(..._bucket[1m]))` |
+| 15 | Latencia P99 | `histogram_quantile(0.99, rate(..._bucket[1m]))` |
+| 16 | Tasa de Errores HTTP % | `rate(...{status=~"5.."}[1m]) / rate(...[1m]) * 100` |
+
+---
+
+## Métricas emitidas por las aplicaciones
+
+### Custom (tag `thread_type`: platform / reactive / virtual)
+
+| Métrica | Tipo | Descripción |
+|---|---|---|
+| `load.requests.total` | Counter | Total de peticiones lanzadas en la prueba de carga |
+| `load.requests.success` | Counter | Peticiones completadas con éxito |
+| `load.requests.failure` | Counter | Peticiones fallidas o rechazadas |
+| `load.request.duration` | Timer | Duración individual de cada petición |
+
+### JVM (automáticas via Spring Boot Actuator + Micrometer)
+
+| Métrica | Descripción |
+|---|---|
+| `jvm_threads_live_threads` | Hilos OS vivos totales |
+| `jvm_threads_states_threads{state}` | Hilos por estado: runnable / blocked / waiting / timed-waiting |
+| `jvm_memory_used_bytes{area="heap"}` | Heap en uso |
+| `jvm_memory_max_bytes{area="heap"}` | Heap máximo configurado |
+| `process_resident_memory_bytes` | Memoria RSS del proceso (memoria real en OS) |
+| `process_cpu_usage` | CPU consumida por el proceso |
+| `jvm_gc_pause_seconds_sum/count` | Tiempo y frecuencia de paradas del GC |
+
+### HTTP (automáticas via Spring MVC / WebFlux)
+
+| Métrica | Descripción |
+|---|---|
+| `http_server_requests_seconds` | Latencia HTTP con SLO buckets: 50ms, 100ms, 200ms, 500ms, 1s, 2s, 5s |
+
+---
+
+## Qué observar bajo carga
+
+| Métrica | Platform Threads | Reactive | Virtual Threads |
+| --- | --- | --- | --- |
+| Hilos bloqueados | Suben con la carga | ~0 | ~0 (se desmontan del carrier) |
+| Latencia P99 | Se dispara al saturar el pool | Estable | Estable |
+| Tasa de errores | Sube cuando el pool se agota | Muy baja | Muy baja |
+| Throughput | Limitado por el tamaño del pool | Alto | Alto |
+| GC pressure | Moderada | Alta (muchos objetos Mono/Flux) | Moderada |
+| CPU (context switch) | Alta bajo saturación | Eficiente | Eficiente |
+
+---
+
+## Troubleshooting
+
+### Prometheus no encuentra las apps Java
 ```bash
-# Conectar desde el host
-psql -h localhost -U postgres -d testdb
+# Verifica que la app expone métricas
+curl http://localhost:8080/actuator/prometheus
 
-# Conectar desde Docker
-docker exec -it postgres psql -U postgres -d testdb
+# Revisa los targets en Prometheus
+open http://localhost:9090/targets
 ```
-
-### Kafka
-```bash
-# Crear un topic de prueba
-docker exec -it kafka kafka-topics.sh --create --topic test-topic --bootstrap-server localhost:9092 --partitions 3 --replication-factor 1
-
-# Listar topics
-docker exec -it kafka kafka-topics.sh --list --bootstrap-server localhost:9092
-
-# Producir mensajes
-docker exec -it kafka kafka-console-producer.sh --topic test-topic --bootstrap-server localhost:9092
-
-# Consumir mensajes
-docker exec -it kafka kafka-console-consumer.sh --topic test-topic --from-beginning --bootstrap-server localhost:9092
-```
-
-## 📊 Configuración para Aplicaciones Java
-
-### Spring Boot con Micrometer
-
-1. Añade las dependencias necesarias en tu `pom.xml`:
-```xml
-<dependency>
-    <groupId>io.micrometer</groupId>
-    <artifactId>micrometer-registry-prometheus</artifactId>
-</dependency>
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-actuator</artifactId>
-</dependency>
-```
-
-2. Configura `application.properties`:
-```properties
-management.endpoints.web.exposure.include=prometheus,health,info,metrics
-management.metrics.export.prometheus.enabled=true
-```
-
-3. Actualiza `prometheus.yml` para incluir tus aplicaciones:
-```yaml
-- job_name: 'java-apps'
-  static_configs:
-    - targets: ['host.docker.internal:8080', 'host.docker.internal:8081']
-  metrics_path: '/actuator/prometheus'
-```
-
-4. Reinicia Prometheus:
-```bash
-docker-compose restart prometheus
-```
-
-## 📈 Métricas Útiles para Threads vs Virtual Threads
-
-### Métricas a monitorear en Prometheus/Grafana:
-
-- **JVM Threads**: `jvm_threads_live_threads`
-- **CPU Usage**: `process_cpu_usage`
-- **Memory**: `jvm_memory_used_bytes`
-- **GC**: `jvm_gc_pause_seconds_sum`
-- **HTTP Requests**: `http_server_requests_seconds_count`
-- **Latency**: `http_server_requests_seconds_sum`
-
-### Queries de ejemplo en Prometheus:
-
-```promql
-# Threads activos
-jvm_threads_live_threads
-
-# CPU usage
-rate(process_cpu_seconds_total[1m])
-
-# Request rate
-rate(http_server_requests_seconds_count[1m])
-
-# Latencia media
-rate(http_server_requests_seconds_sum[1m]) / rate(http_server_requests_seconds_count[1m])
-```
-
-## 🛠️ Verificar Estado de los Servicios
-
-```bash
-# Ver estado de todos los contenedores
-docker-compose ps
-
-# Ver salud de los servicios
-docker inspect --format='{{.State.Health.Status}}' prometheus
-docker inspect --format='{{.State.Health.Status}}' grafana
-docker inspect --format='{{.State.Health.Status}}' postgres
-docker inspect --format='{{.State.Health.Status}}' kafka
-```
-
-## 🔧 Troubleshooting
-
-### Kafka no arranca
-Si Kafka tiene problemas al iniciar, intenta:
-```bash
-docker-compose down
-docker-compose up -d kafka
-docker-compose logs -f kafka
-```
-
-### Prometheus no encuentra las métricas
-1. Verifica que tus aplicaciones expongan métricas: `curl http://localhost:8080/actuator/prometheus`
-2. Revisa los targets en Prometheus: http://localhost:9090/targets
-3. Verifica la configuración en `prometheus.yml`
 
 ### Grafana no muestra datos
-1. Verifica que Prometheus esté corriendo: http://localhost:9090
-2. Comprueba el datasource en Grafana: Configuration → Data Sources
-3. Asegúrate de que hay datos en Prometheus: http://localhost:9090/graph
+1. Verifica que Prometheus está UP: http://localhost:9090
+2. Comprueba el datasource: Configuration → Data Sources
+3. Confirma que hay datos: http://localhost:9090/graph
 
-## 📝 Notas
+### Reconstruir Grafana tras cambiar dashboards
+```bash
+docker compose up --build grafana -d
+```
 
-- **Sin persistencia**: Los datos no persisten entre reinicios (configuración para PoC)
-- **Kafka KRaft**: Usa el modo KRaft moderno sin Zookeeper
-- **Red Docker**: Todos los servicios en la red `app-network` para comunicación interna
-- **Health checks**: Todos los servicios tienen health checks configurados
-
-## 🎯 Para tu PoC de Threads vs Virtual Threads
-
-1. Ejecuta tus aplicaciones exponiendo métricas en diferentes puertos
-2. Configura Prometheus para scraping de ambas aplicaciones
-3. Crea dashboards en Grafana comparando:
-   - Número de threads
-   - Uso de CPU
-   - Uso de memoria
-   - Throughput (requests/segundo)
-   - Latencia (p50, p95, p99)
-   - Tiempo de respuesta
-
-¡Buena suerte con tu PoC! 🚀
+### Reconstruir Prometheus tras cambiar prometheus.yml
+```bash
+docker compose restart prometheus
+```
