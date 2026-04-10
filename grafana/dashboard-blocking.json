@@ -7,18 +7,22 @@
   "panels": [
     {
       "id": 1,
-      "title": "Memoria Heap Utilizada",
+      "title": "jvm_memory_used_bytes{area=\"heap\"}",
       "type": "graph",
       "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+      "lines": true,
+      "fill": 1,
+      "linewidth": 2,
+      "nullPointMode": "null",
       "targets": [
         {
           "expr": "jvm_memory_used_bytes{area=\"heap\",app=\"web-server-blocking\"}",
-          "legendFormat": "web-server-blocking - Heap Utilizada",
+          "legendFormat": "Memoria Heap Utilizada - web-server-blocking",
           "refId": "A"
         },
         {
           "expr": "jvm_memory_used_bytes{area=\"heap\",app=\"web-client-blocking\"}",
-          "legendFormat": "web-client-blocking - Heap Utilizada",
+          "legendFormat": "Memoria Heap Utilizada - web-client-blocking",
           "refId": "B"
         }
       ],
@@ -30,18 +34,22 @@
     },
     {
       "id": 2,
-      "title": "Memoria Heap Máxima",
+      "title": "jvm_memory_max_bytes{area=\"heap\"}",
       "type": "graph",
       "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+      "lines": true,
+      "fill": 1,
+      "linewidth": 2,
+      "nullPointMode": "null",
       "targets": [
         {
           "expr": "jvm_memory_max_bytes{area=\"heap\",app=\"web-server-blocking\"}",
-          "legendFormat": "web-server-blocking - Heap Máxima",
+          "legendFormat": "Memoria Heap Máxima - web-server-blocking",
           "refId": "A"
         },
         {
           "expr": "jvm_memory_max_bytes{area=\"heap\",app=\"web-client-blocking\"}",
-          "legendFormat": "web-client-blocking - Heap Máxima",
+          "legendFormat": "Memoria Heap Máxima - web-client-blocking",
           "refId": "B"
         }
       ],
@@ -53,18 +61,22 @@
     },
     {
       "id": 3,
-      "title": "Porcentaje de Uso de Heap",
+      "title": "(jvm_memory_used_bytes{area=\"heap\"} / jvm_memory_max_bytes{area=\"heap\"}) * 100",
       "type": "graph",
       "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+      "lines": true,
+      "fill": 1,
+      "linewidth": 2,
+      "nullPointMode": "null",
       "targets": [
         {
           "expr": "(jvm_memory_used_bytes{area=\"heap\",app=\"web-server-blocking\"} / jvm_memory_max_bytes{area=\"heap\",app=\"web-server-blocking\"}) * 100",
-          "legendFormat": "web-server-blocking - Uso de Heap %",
+          "legendFormat": "Porcentaje de Uso de Heap - web-server-blocking",
           "refId": "A"
         },
         {
           "expr": "(jvm_memory_used_bytes{area=\"heap\",app=\"web-client-blocking\"} / jvm_memory_max_bytes{area=\"heap\",app=\"web-client-blocking\"}) * 100",
-          "legendFormat": "web-client-blocking - Uso de Heap %",
+          "legendFormat": "Porcentaje de Uso de Heap - web-client-blocking",
           "refId": "B"
         }
       ],
@@ -88,18 +100,22 @@
     },
     {
       "id": 4,
-      "title": "Memoria RSS del Proceso",
+      "title": "process_resident_memory_bytes",
       "type": "graph",
       "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+      "lines": true,
+      "fill": 1,
+      "linewidth": 2,
+      "nullPointMode": "null",
       "targets": [
         {
           "expr": "process_resident_memory_bytes{app=\"web-server-blocking\"}",
-          "legendFormat": "web-server-blocking - Memoria RSS",
+          "legendFormat": "Memoria RSS del Proceso - web-server-blocking",
           "refId": "A"
         },
         {
           "expr": "process_resident_memory_bytes{app=\"web-client-blocking\"}",
-          "legendFormat": "web-client-blocking - Memoria RSS",
+          "legendFormat": "Memoria RSS del Proceso - web-client-blocking",
           "refId": "B"
         }
       ],
@@ -111,18 +127,22 @@
     },
     {
       "id": 5,
-      "title": "Hilos Vivos por Aplicación",
+      "title": "jvm_threads_live_threads",
       "type": "graph",
       "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16},
+      "lines": true,
+      "fill": 1,
+      "linewidth": 2,
+      "nullPointMode": "null",
       "targets": [
         {
           "expr": "jvm_threads_live_threads{app=\"web-server-blocking\"}",
-          "legendFormat": "web-server-blocking - Hilos Vivos",
+          "legendFormat": "Hilos Vivos por Aplicación - web-server-blocking",
           "refId": "A"
         },
         {
           "expr": "jvm_threads_live_threads{app=\"web-client-blocking\"}",
-          "legendFormat": "web-client-blocking - Hilos Vivos",
+          "legendFormat": "Hilos Vivos por Aplicación - web-client-blocking",
           "refId": "B"
         }
       ],
@@ -134,18 +154,22 @@
     },
     {
       "id": 6,
-      "title": "Hilos Daemon",
+      "title": "jvm_threads_daemon_threads",
       "type": "graph",
       "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16},
+      "lines": true,
+      "fill": 1,
+      "linewidth": 2,
+      "nullPointMode": "null",
       "targets": [
         {
           "expr": "jvm_threads_daemon_threads{app=\"web-server-blocking\"}",
-          "legendFormat": "web-server-blocking - Hilos Daemon",
+          "legendFormat": "Hilos Daemon - web-server-blocking",
           "refId": "A"
         },
         {
           "expr": "jvm_threads_daemon_threads{app=\"web-client-blocking\"}",
-          "legendFormat": "web-client-blocking - Hilos Daemon",
+          "legendFormat": "Hilos Daemon - web-client-blocking",
           "refId": "B"
         }
       ],
@@ -157,48 +181,52 @@
     },
     {
       "id": 7,
-      "title": "Hilos por Estado",
+      "title": "jvm_threads_states_threads",
       "type": "graph",
       "gridPos": {"h": 8, "w": 24, "x": 0, "y": 24},
+      "lines": true,
+      "fill": 1,
+      "linewidth": 2,
+      "nullPointMode": "null",
       "targets": [
         {
           "expr": "jvm_threads_states_threads{app=\"web-server-blocking\",state=\"runnable\"}",
-          "legendFormat": "web-server-blocking - Ejecutable",
+          "legendFormat": "Hilos por Estado - web-server-blocking - runnable",
           "refId": "A"
         },
         {
           "expr": "jvm_threads_states_threads{app=\"web-server-blocking\",state=\"blocked\"}",
-          "legendFormat": "web-server-blocking - Bloqueado",
+          "legendFormat": "Hilos por Estado - web-server-blocking - blocked",
           "refId": "B"
         },
         {
           "expr": "jvm_threads_states_threads{app=\"web-server-blocking\",state=\"waiting\"}",
-          "legendFormat": "web-server-blocking - Esperando",
+          "legendFormat": "Hilos por Estado - web-server-blocking - waiting",
           "refId": "C"
         },
         {
           "expr": "jvm_threads_states_threads{app=\"web-server-blocking\",state=\"timed-waiting\"}",
-          "legendFormat": "web-server-blocking - Esperando con Tiempo",
+          "legendFormat": "Hilos por Estado - web-server-blocking - timed-waiting",
           "refId": "D"
         },
         {
           "expr": "jvm_threads_states_threads{app=\"web-client-blocking\",state=\"runnable\"}",
-          "legendFormat": "web-client-blocking - Ejecutable",
+          "legendFormat": "Hilos por Estado - web-client-blocking - runnable",
           "refId": "E"
         },
         {
           "expr": "jvm_threads_states_threads{app=\"web-client-blocking\",state=\"blocked\"}",
-          "legendFormat": "web-client-blocking - Bloqueado",
+          "legendFormat": "Hilos por Estado - web-client-blocking - blocked",
           "refId": "F"
         },
         {
           "expr": "jvm_threads_states_threads{app=\"web-client-blocking\",state=\"waiting\"}",
-          "legendFormat": "web-client-blocking - Esperando",
+          "legendFormat": "Hilos por Estado - web-client-blocking - waiting",
           "refId": "G"
         },
         {
           "expr": "jvm_threads_states_threads{app=\"web-client-blocking\",state=\"timed-waiting\"}",
-          "legendFormat": "web-client-blocking - Esperando con Tiempo",
+          "legendFormat": "Hilos por Estado - web-client-blocking - timed-waiting",
           "refId": "H"
         }
       ],
@@ -210,18 +238,22 @@
     },
     {
       "id": 8,
-      "title": "Uso de CPU por Aplicación",
+      "title": "process_cpu_usage",
       "type": "graph",
       "gridPos": {"h": 8, "w": 12, "x": 0, "y": 32},
+      "lines": true,
+      "fill": 1,
+      "linewidth": 2,
+      "nullPointMode": "null",
       "targets": [
         {
           "expr": "process_cpu_usage{app=\"web-server-blocking\"}",
-          "legendFormat": "web-server-blocking - Uso de CPU",
+          "legendFormat": "Uso de CPU por Aplicación - web-server-blocking",
           "refId": "A"
         },
         {
           "expr": "process_cpu_usage{app=\"web-client-blocking\"}",
-          "legendFormat": "web-client-blocking - Uso de CPU",
+          "legendFormat": "Uso de CPU por Aplicación - web-client-blocking",
           "refId": "B"
         }
       ],
@@ -233,18 +265,22 @@
     },
     {
       "id": 9,
-      "title": "Tiempo de CPU del Sistema",
+      "title": "system_cpu_usage",
       "type": "graph",
       "gridPos": {"h": 8, "w": 12, "x": 12, "y": 32},
+      "lines": true,
+      "fill": 1,
+      "linewidth": 2,
+      "nullPointMode": "null",
       "targets": [
         {
           "expr": "system_cpu_usage{app=\"web-server-blocking\"}",
-          "legendFormat": "web-server-blocking - CPU Sistema",
+          "legendFormat": "Tiempo de CPU del Sistema - web-server-blocking",
           "refId": "A"
         },
         {
           "expr": "system_cpu_usage{app=\"web-client-blocking\"}",
-          "legendFormat": "web-client-blocking - CPU Sistema",
+          "legendFormat": "Tiempo de CPU del Sistema - web-client-blocking",
           "refId": "B"
         }
       ],
@@ -256,18 +292,22 @@
     },
     {
       "id": 10,
-      "title": "Throughput HTTP (Peticiones/seg)",
+      "title": "rate(http_server_requests_seconds_count[1m])",
       "type": "graph",
       "gridPos": {"h": 8, "w": 12, "x": 0, "y": 40},
+      "lines": true,
+      "fill": 1,
+      "linewidth": 2,
+      "nullPointMode": "null",
       "targets": [
         {
           "expr": "rate(http_server_requests_seconds_count{app=\"web-server-blocking\"}[1m])",
-          "legendFormat": "web-server-blocking - Peticiones/seg",
+          "legendFormat": "Throughput HTTP (Peticiones/seg) - web-server-blocking",
           "refId": "A"
         },
         {
           "expr": "rate(http_server_requests_seconds_count{app=\"web-client-blocking\"}[1m])",
-          "legendFormat": "web-client-blocking - Peticiones/seg",
+          "legendFormat": "Throughput HTTP (Peticiones/seg) - web-client-blocking",
           "refId": "B"
         }
       ],
@@ -279,18 +319,22 @@
     },
     {
       "id": 11,
-      "title": "Latencia Media de Respuesta HTTP",
+      "title": "rate(http_server_requests_seconds_sum[1m]) / rate(http_server_requests_seconds_count[1m])",
       "type": "graph",
       "gridPos": {"h": 8, "w": 12, "x": 12, "y": 40},
+      "lines": true,
+      "fill": 1,
+      "linewidth": 2,
+      "nullPointMode": "null",
       "targets": [
         {
           "expr": "rate(http_server_requests_seconds_sum{app=\"web-server-blocking\"}[1m]) / rate(http_server_requests_seconds_count{app=\"web-server-blocking\"}[1m])",
-          "legendFormat": "web-server-blocking - Latencia Media",
+          "legendFormat": "Latencia Media de Respuesta HTTP - web-server-blocking",
           "refId": "A"
         },
         {
           "expr": "rate(http_server_requests_seconds_sum{app=\"web-client-blocking\"}[1m]) / rate(http_server_requests_seconds_count{app=\"web-client-blocking\"}[1m])",
-          "legendFormat": "web-client-blocking - Latencia Media",
+          "legendFormat": "Latencia Media de Respuesta HTTP - web-client-blocking",
           "refId": "B"
         }
       ],
@@ -302,18 +346,22 @@
     },
     {
       "id": 12,
-      "title": "Tasa de Garbage Collection",
+      "title": "rate(jvm_gc_pause_seconds_sum[1m])",
       "type": "graph",
       "gridPos": {"h": 8, "w": 12, "x": 0, "y": 48},
+      "lines": true,
+      "fill": 1,
+      "linewidth": 2,
+      "nullPointMode": "null",
       "targets": [
         {
           "expr": "rate(jvm_gc_pause_seconds_sum{app=\"web-server-blocking\"}[1m])",
-          "legendFormat": "web-server-blocking - Tasa de GC",
+          "legendFormat": "Tasa de Garbage Collection - web-server-blocking",
           "refId": "A"
         },
         {
           "expr": "rate(jvm_gc_pause_seconds_sum{app=\"web-client-blocking\"}[1m])",
-          "legendFormat": "web-client-blocking - Tasa de GC",
+          "legendFormat": "Tasa de Garbage Collection - web-client-blocking",
           "refId": "B"
         }
       ],
@@ -325,18 +373,22 @@
     },
     {
       "id": 13,
-      "title": "Conteo de Recolecciones de Basura",
+      "title": "rate(jvm_gc_pause_seconds_count[1m])",
       "type": "graph",
       "gridPos": {"h": 8, "w": 12, "x": 12, "y": 48},
+      "lines": true,
+      "fill": 1,
+      "linewidth": 2,
+      "nullPointMode": "null",
       "targets": [
         {
           "expr": "rate(jvm_gc_pause_seconds_count{app=\"web-server-blocking\"}[1m])",
-          "legendFormat": "web-server-blocking - Recolecciones/seg",
+          "legendFormat": "Conteo de Recolecciones de Basura - web-server-blocking",
           "refId": "A"
         },
         {
           "expr": "rate(jvm_gc_pause_seconds_count{app=\"web-client-blocking\"}[1m])",
-          "legendFormat": "web-client-blocking - Recolecciones/seg",
+          "legendFormat": "Conteo de Recolecciones de Basura - web-client-blocking",
           "refId": "B"
         }
       ],

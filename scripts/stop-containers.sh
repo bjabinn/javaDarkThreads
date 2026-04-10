@@ -1,18 +1,29 @@
 #!/bin/bash
 
-# Script para parar y eliminar todos los servicios
+# Script para parar y eliminar servicios
+# Uso: ./stop-containers.sh [container1 container2 ...]
+#   Sin argumentos: para todos los contenedores (prometheus grafana postgres kafka)
+#   Con argumentos: para solo los contenedores indicados
 
-echo "🛑 Parando todos los servicios..."
+ALL_CONTAINERS="prometheus grafana postgres kafka"
+
+if [ $# -eq 0 ]; then
+  TARGETS=$ALL_CONTAINERS
+  echo "🛑 Parando todos los servicios..."
+else
+  TARGETS="$@"
+  echo "🛑 Parando contenedores: $TARGETS"
+fi
+
 echo "================================================"
 echo ""
 
-# Parar y eliminar contenedores
 echo "Parando contenedores..."
-docker stop prometheus grafana postgres kafka 2>/dev/null
-docker rm prometheus grafana postgres kafka 2>/dev/null
+docker stop $TARGETS 2>/dev/null
+docker rm $TARGETS 2>/dev/null
 
 echo ""
-echo "✅ Todos los contenedores han sido parados y eliminados"
+echo "✅ Contenedores parados y eliminados: $TARGETS"
 echo ""
 echo "Para eliminar también las imágenes:"
 echo "  docker rmi poc-prometheus poc-grafana poc-postgres poc-kafka"
