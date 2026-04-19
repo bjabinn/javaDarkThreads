@@ -6,7 +6,6 @@ import java.util.Map;
 public class LoadResponse {
     
     private int totalRequests;
-    private int threadsUsed;
     private long totalDurationMs;
     private double throughput; // requests per second
     private double avgResponseTimeMs;
@@ -29,14 +28,6 @@ public class LoadResponse {
     
     public void setTotalRequests(int totalRequests) {
         this.totalRequests = totalRequests;
-    }
-    
-    public int getThreadsUsed() {
-        return threadsUsed;
-    }
-    
-    public void setThreadsUsed(int threadsUsed) {
-        this.threadsUsed = threadsUsed;
     }
     
     public long getTotalDurationMs() {

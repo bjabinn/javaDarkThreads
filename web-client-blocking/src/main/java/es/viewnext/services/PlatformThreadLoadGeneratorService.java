@@ -83,8 +83,7 @@ public class PlatformThreadLoadGeneratorService {
             for (int i = 0; i < request.getRequests(); i++) {
                 final int requestNum = i;
                 Future<Long> future = executorService.submit(() -> {
-                    return executeRequest(requestNum, request.getDelayMs(), request.getTargetUrl(), 
-                                         successCount, failureCount);
+                    return executeRequest(requestNum, request.getTargetUrl(), successCount, failureCount);
                 });
                 futures.add(future);
             }
@@ -149,7 +148,7 @@ public class PlatformThreadLoadGeneratorService {
         return response;
     }
     
-    private Long executeRequest(int requestNum, long delayMs, String targetUrl, 
+    private Long executeRequest(int requestNum, String targetUrl,
                                 AtomicInteger successCount, AtomicInteger failureCount) {
         return requestTimer.record(() -> {
             long start = System.nanoTime();
@@ -158,33 +157,16 @@ public class PlatformThreadLoadGeneratorService {
                 requestCounter.increment();
                 
                 // If targetUrl is provided, make real HTTP call
-                if (targetUrl != null && !targetUrl.isEmpty()) {
-                    try {
-                        // Make actual HTTP GET request using platform threads (blocking I/O)
-                        ResponseEntity<String> response = restTemplate.getForEntity(targetUrl, String.class);
-                        
-                        if (response.getStatusCode().is2xxSuccessful()) {
-                            successCount.incrementAndGet();
-                            successCounter.increment();
-                            logger.debug("Request #{} received HTTP {} from {}", 
-                                       requestNum, response.getStatusCode(), targetUrl);
-                        } else {
-                            failureCount.incrementAndGet();
-                            failureCounter.increment();
-                            logger.warn("Request #{} received non-2xx HTTP {} from {}", 
-                                      requestNum, response.getStatusCode(), targetUrl);
-                        }
-                    } catch (RestClientException e) {
-                        logger.error("Request #{} failed to call: {}", requestNum, targetUrl, e);
-                        throw e; // Re-throw to be caught by outer catch block
-                    }
-                } else {
-                    // No URL provided, just simulate delay
-                    if (delayMs > 0) {
-                        Thread.sleep(delayMs);
-                    }
+                ResponseEntity<String> response = restTemplate.getForEntity(targetUrl, String.class);
+
+                if (response.getStatusCode().is2xxSuccessful()) {
                     successCount.incrementAndGet();
                     successCounter.increment();
+                    logger.debug("Request #{} received HTTP {} from {}", requestNum, response.getStatusCode(), targetUrl);
+                } else {
+                    failureCount.incrementAndGet();
+                    failureCounter.increment();
+                    logger.warn("Request #{} received non-2xx HTTP {} from {}", requestNum, response.getStatusCode(), targetUrl);
                 }
                 
                 long duration = (System.nanoTime() - start) / 1_000_000; // convert to ms

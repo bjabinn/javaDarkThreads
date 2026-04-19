@@ -13,7 +13,6 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -72,8 +71,7 @@ public class ReactiveLoadGeneratorService {
         
         // Execute requests reactively using Flux
         return Flux.range(0, request.getRequests())
-                .flatMap(i -> executeReactiveRequest(i, request.getDelayMs(), 
-                        request.getTargetUrl(), successCount, failureCount),
+                .flatMap(i -> executeReactiveRequest(i, request.getTargetUrl(), successCount, failureCount),
                         request.getThreads()) // Concurrency level
                 .collectList()
                 .map(responseTimes -> {
@@ -115,7 +113,7 @@ public class ReactiveLoadGeneratorService {
                 .doOnError(error -> logger.error("Error executing reactive load test", error));
     }
     
-    private Mono<Long> executeReactiveRequest(int requestNum, long delayMs, String targetUrl,
+    private Mono<Long> executeReactiveRequest(int requestNum, String targetUrl,
                                               AtomicInteger successCount, AtomicInteger failureCount) {
         long start = System.nanoTime();
         
@@ -149,21 +147,6 @@ public class ReactiveLoadGeneratorService {
                         return Mono.empty();
                     })
                     .then(Mono.fromCallable(() -> {
-                        long duration = (System.nanoTime() - start) / 1_000_000;
-                        logger.debug("Request #{} completed in {} ms", requestNum, duration);
-                        requestTimer.record(duration, java.util.concurrent.TimeUnit.MILLISECONDS);
-                        return duration;
-                    }));
-        } else {
-            // No URL provided, just simulate delay reactively
-            Mono<Void> delayMono = delayMs > 0 
-                    ? Mono.delay(Duration.ofMillis(delayMs)).then()
-                    : Mono.empty();
-            
-            requestMono = delayMono
-                    .then(Mono.fromCallable(() -> {
-                        successCount.incrementAndGet();
-                        successCounter.increment();
                         long duration = (System.nanoTime() - start) / 1_000_000;
                         logger.debug("Request #{} completed in {} ms", requestNum, duration);
                         requestTimer.record(duration, java.util.concurrent.TimeUnit.MILLISECONDS);
