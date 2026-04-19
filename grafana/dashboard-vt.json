@@ -1,7 +1,16 @@
 {
   "uid": "jvm-threads-vt",
   "title": "Monitoreo JVM y Comparación de Hilos - Virtual Threads",
-  "tags": ["java", "jvm", "metrics", "monitoring", "threads", "performance", "virtual-threads", "loom"],
+  "tags": [
+    "java",
+    "jvm",
+    "metrics",
+    "monitoring",
+    "threads",
+    "performance",
+    "virtual-threads",
+    "loom"
+  ],
   "timezone": "browser",
   "editable": true,
   "panels": [
@@ -9,111 +18,190 @@
       "id": 1,
       "title": "Memoria Heap Utilizada",
       "type": "graph",
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
       "targets": [
         {
-          "expr": "jvm_memory_used_bytes{area=\"heap\",app=\"web-server-vt\"}",
+          "expr": "sum by (app) (jvm_memory_used_bytes{area=\"heap\",app=\"web-server-vt\"})",
           "legendFormat": "web-server-vt - Heap Utilizada",
           "refId": "A"
         },
         {
-          "expr": "jvm_memory_used_bytes{area=\"heap\",app=\"web-client-vt\"}",
+          "expr": "sum by (app) (jvm_memory_used_bytes{area=\"heap\",app=\"web-client-vt\"})",
           "legendFormat": "web-client-vt - Heap Utilizada",
           "refId": "B"
         }
       ],
       "yaxes": [
-        {"format": "bytes", "label": "Memoria"},
-        {"format": "short"}
+        {
+          "format": "bytes",
+          "label": "Memoria"
+        },
+        {
+          "format": "short"
+        }
       ],
-      "description": "Memoria heap utilizada por las aplicaciones de virtual threads"
+      "description": "Memoria heap utilizada por las aplicaciones de virtual threads",
+      "lines": true,
+      "fill": 1,
+      "linewidth": 2,
+      "nullPointMode": "null"
     },
     {
       "id": 2,
-      "title": "Memoria Heap Máxima",
+      "title": "Memoria Non-Heap Utilizada (Metaspace + Code Cache)",
       "type": "graph",
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
       "targets": [
         {
-          "expr": "jvm_memory_max_bytes{area=\"heap\",app=\"web-server-vt\"}",
-          "legendFormat": "web-server-vt - Heap Máxima",
+          "expr": "sum by (app) (jvm_memory_used_bytes{area=\"nonheap\",app=\"web-server-vt\"})",
+          "legendFormat": "web-server-vt - Non-Heap",
           "refId": "A"
         },
         {
-          "expr": "jvm_memory_max_bytes{area=\"heap\",app=\"web-client-vt\"}",
-          "legendFormat": "web-client-vt - Heap Máxima",
+          "expr": "sum by (app) (jvm_memory_used_bytes{area=\"nonheap\",app=\"web-client-vt\"})",
+          "legendFormat": "web-client-vt - Non-Heap",
           "refId": "B"
         }
       ],
       "yaxes": [
-        {"format": "bytes", "label": "Memoria"},
-        {"format": "short"}
+        {
+          "format": "bytes",
+          "label": "Memoria"
+        },
+        {
+          "format": "short"
+        }
       ],
-      "description": "Memoria heap máxima configurada"
+      "description": "Memoria fuera del heap: Metaspace, Code Cache, Compressed Class Space",
+      "lines": true,
+      "fill": 1,
+      "linewidth": 2,
+      "nullPointMode": "null"
     },
     {
       "id": 3,
       "title": "Porcentaje de Uso de Heap",
       "type": "graph",
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
       "targets": [
         {
-          "expr": "(jvm_memory_used_bytes{area=\"heap\",app=\"web-server-vt\"} / jvm_memory_max_bytes{area=\"heap\",app=\"web-server-vt\"}) * 100",
-          "legendFormat": "web-server-vt - Uso de Heap %",
+          "expr": "(sum by (app) (jvm_memory_used_bytes{area=\"heap\",app=\"web-server-vt\"}) / sum by (app) (jvm_memory_max_bytes{area=\"heap\",app=\"web-server-vt\"})) * 100",
+          "legendFormat": "web-server-vt - Uso Heap %",
           "refId": "A"
         },
         {
-          "expr": "(jvm_memory_used_bytes{area=\"heap\",app=\"web-client-vt\"} / jvm_memory_max_bytes{area=\"heap\",app=\"web-client-vt\"}) * 100",
-          "legendFormat": "web-client-vt - Uso de Heap %",
+          "expr": "(sum by (app) (jvm_memory_used_bytes{area=\"heap\",app=\"web-client-vt\"}) / sum by (app) (jvm_memory_max_bytes{area=\"heap\",app=\"web-client-vt\"})) * 100",
+          "legendFormat": "web-client-vt - Uso Heap %",
           "refId": "B"
         }
       ],
       "yaxes": [
-        {"format": "percent", "label": "Uso", "max": 100, "min": 0},
-        {"format": "short"}
+        {
+          "format": "percent",
+          "label": "Uso",
+          "max": 100,
+          "min": 0
+        },
+        {
+          "format": "short"
+        }
       ],
       "alert": {
         "conditions": [
           {
-            "evaluator": {"params": [85], "type": "gt"},
-            "operator": {"type": "and"},
-            "query": {"params": ["A", "5m", "now"]},
-            "reducer": {"params": [], "type": "avg"},
+            "evaluator": {
+              "params": [
+                85
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": [
+                "A",
+                "5m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "avg"
+            },
             "type": "query"
           }
         ],
         "name": "Alerta de Uso Alto de Heap - VT"
       },
-      "description": "Porcentaje de uso de memoria heap. Alerta cuando supera el 85%"
+      "description": "Porcentaje de uso de memoria heap. Alerta cuando supera el 85%",
+      "lines": true,
+      "fill": 1,
+      "linewidth": 2,
+      "nullPointMode": "null"
     },
     {
       "id": 4,
-      "title": "Memoria RSS del Proceso",
+      "title": "Memoria JVM Total (Heap + Non-Heap)",
       "type": "graph",
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
       "targets": [
         {
-          "expr": "process_resident_memory_bytes{app=\"web-server-vt\"}",
-          "legendFormat": "web-server-vt - Memoria RSS",
+          "expr": "sum by (app) (jvm_memory_used_bytes{app=\"web-server-vt\"})",
+          "legendFormat": "web-server-vt - Heap + Non-Heap",
           "refId": "A"
         },
         {
-          "expr": "process_resident_memory_bytes{app=\"web-client-vt\"}",
-          "legendFormat": "web-client-vt - Memoria RSS",
+          "expr": "sum by (app) (jvm_memory_used_bytes{app=\"web-client-vt\"})",
+          "legendFormat": "web-client-vt - Heap + Non-Heap",
           "refId": "B"
         }
       ],
       "yaxes": [
-        {"format": "bytes", "label": "Memoria"},
-        {"format": "short"}
+        {
+          "format": "bytes",
+          "label": "Memoria"
+        },
+        {
+          "format": "short"
+        }
       ],
-      "description": "Resident Set Size (RSS) - Memoria física utilizada por el proceso"
+      "description": "Memoria JVM total (heap + non-heap). No incluye stacks de OS threads (fuera del heap)",
+      "lines": true,
+      "fill": 1,
+      "linewidth": 2,
+      "nullPointMode": "null"
     },
     {
       "id": 5,
       "title": "Hilos Vivos por Aplicación",
       "type": "graph",
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16},
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 16
+      },
       "targets": [
         {
           "expr": "jvm_threads_live_threads{app=\"web-server-vt\"}",
@@ -127,16 +215,30 @@
         }
       ],
       "yaxes": [
-        {"format": "short", "label": "Hilos"},
-        {"format": "short"}
+        {
+          "format": "short",
+          "label": "Hilos"
+        },
+        {
+          "format": "short"
+        }
       ],
-      "description": "Total de hilos vivos por aplicación (virtual threads incluidos)"
+      "description": "Total de hilos vivos por aplicación (virtual threads incluidos)",
+      "lines": true,
+      "fill": 1,
+      "linewidth": 2,
+      "nullPointMode": "null"
     },
     {
       "id": 6,
       "title": "Hilos Daemon",
       "type": "graph",
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16},
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 16
+      },
       "targets": [
         {
           "expr": "jvm_threads_daemon_threads{app=\"web-server-vt\"}",
@@ -150,16 +252,30 @@
         }
       ],
       "yaxes": [
-        {"format": "short", "label": "Hilos"},
-        {"format": "short"}
+        {
+          "format": "short",
+          "label": "Hilos"
+        },
+        {
+          "format": "short"
+        }
       ],
-      "description": "Número de hilos daemon activos"
+      "description": "Número de hilos daemon activos",
+      "lines": true,
+      "fill": 1,
+      "linewidth": 2,
+      "nullPointMode": "null"
     },
     {
       "id": 7,
       "title": "Hilos por Estado",
       "type": "graph",
-      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 24},
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 24
+      },
       "targets": [
         {
           "expr": "jvm_threads_states_threads{app=\"web-server-vt\",state=\"runnable\"}",
@@ -203,16 +319,30 @@
         }
       ],
       "yaxes": [
-        {"format": "short", "label": "Hilos"},
-        {"format": "short"}
+        {
+          "format": "short",
+          "label": "Hilos"
+        },
+        {
+          "format": "short"
+        }
       ],
-      "description": "Distribución de hilos por estado. Con virtual threads, 'blocked' debe ser prácticamente 0 ya que se desmontan del carrier thread al hacer I/O"
+      "description": "Distribución de hilos por estado. Con virtual threads, 'blocked' debe ser prácticamente 0 ya que se desmontan del carrier thread al hacer I/O",
+      "lines": true,
+      "fill": 1,
+      "linewidth": 2,
+      "nullPointMode": "null"
     },
     {
       "id": 8,
       "title": "Uso de CPU por Aplicación",
       "type": "graph",
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 32},
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 32
+      },
       "targets": [
         {
           "expr": "process_cpu_usage{app=\"web-server-vt\"}",
@@ -226,16 +356,32 @@
         }
       ],
       "yaxes": [
-        {"format": "percentunit", "label": "CPU", "max": 1, "min": 0},
-        {"format": "short"}
+        {
+          "format": "percentunit",
+          "label": "CPU",
+          "max": 1,
+          "min": 0
+        },
+        {
+          "format": "short"
+        }
       ],
-      "description": "Porcentaje de uso de CPU por aplicación"
+      "description": "Porcentaje de uso de CPU por aplicación",
+      "lines": true,
+      "fill": 1,
+      "linewidth": 2,
+      "nullPointMode": "null"
     },
     {
       "id": 9,
       "title": "Tiempo de CPU del Sistema",
       "type": "graph",
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 32},
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 32
+      },
       "targets": [
         {
           "expr": "system_cpu_usage{app=\"web-server-vt\"}",
@@ -249,16 +395,32 @@
         }
       ],
       "yaxes": [
-        {"format": "percentunit", "label": "CPU", "max": 1, "min": 0},
-        {"format": "short"}
+        {
+          "format": "percentunit",
+          "label": "CPU",
+          "max": 1,
+          "min": 0
+        },
+        {
+          "format": "short"
+        }
       ],
-      "description": "Uso de CPU del sistema operativo"
+      "description": "Uso de CPU del sistema operativo",
+      "lines": true,
+      "fill": 1,
+      "linewidth": 2,
+      "nullPointMode": "null"
     },
     {
       "id": 10,
       "title": "Throughput HTTP (Peticiones/seg)",
       "type": "graph",
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 40},
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 40
+      },
       "targets": [
         {
           "expr": "rate(http_server_requests_seconds_count{app=\"web-server-vt\"}[1m])",
@@ -272,16 +434,30 @@
         }
       ],
       "yaxes": [
-        {"format": "reqps", "label": "Peticiones/seg"},
-        {"format": "short"}
+        {
+          "format": "reqps",
+          "label": "Peticiones/seg"
+        },
+        {
+          "format": "short"
+        }
       ],
-      "description": "Tasa de peticiones HTTP procesadas por segundo"
+      "description": "Tasa de peticiones HTTP procesadas por segundo",
+      "lines": true,
+      "fill": 1,
+      "linewidth": 2,
+      "nullPointMode": "null"
     },
     {
       "id": 11,
       "title": "Latencia Media de Respuesta HTTP",
       "type": "graph",
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 40},
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 40
+      },
       "targets": [
         {
           "expr": "rate(http_server_requests_seconds_sum{app=\"web-server-vt\"}[1m]) / rate(http_server_requests_seconds_count{app=\"web-server-vt\"}[1m])",
@@ -295,16 +471,30 @@
         }
       ],
       "yaxes": [
-        {"format": "s", "label": "Latencia"},
-        {"format": "short"}
+        {
+          "format": "s",
+          "label": "Latencia"
+        },
+        {
+          "format": "short"
+        }
       ],
-      "description": "Latencia media de respuesta HTTP"
+      "description": "Latencia media de respuesta HTTP",
+      "lines": true,
+      "fill": 1,
+      "linewidth": 2,
+      "nullPointMode": "null"
     },
     {
       "id": 12,
       "title": "Tasa de Garbage Collection",
       "type": "graph",
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 48},
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 48
+      },
       "targets": [
         {
           "expr": "rate(jvm_gc_pause_seconds_sum{app=\"web-server-vt\"}[1m])",
@@ -318,16 +508,30 @@
         }
       ],
       "yaxes": [
-        {"format": "s", "label": "Tiempo de GC"},
-        {"format": "short"}
+        {
+          "format": "s",
+          "label": "Tiempo de GC"
+        },
+        {
+          "format": "short"
+        }
       ],
-      "description": "Tasa de tiempo consumido por el Garbage Collector"
+      "description": "Tasa de tiempo consumido por el Garbage Collector",
+      "lines": true,
+      "fill": 1,
+      "linewidth": 2,
+      "nullPointMode": "null"
     },
     {
       "id": 13,
       "title": "Conteo de Recolecciones de Basura",
       "type": "graph",
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 48},
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 48
+      },
       "targets": [
         {
           "expr": "rate(jvm_gc_pause_seconds_count{app=\"web-server-vt\"}[1m])",
@@ -341,16 +545,30 @@
         }
       ],
       "yaxes": [
-        {"format": "ops", "label": "GC/seg"},
-        {"format": "short"}
+        {
+          "format": "ops",
+          "label": "GC/seg"
+        },
+        {
+          "format": "short"
+        }
       ],
-      "description": "Frecuencia de ejecuciones del Garbage Collector por segundo"
+      "description": "Frecuencia de ejecuciones del Garbage Collector por segundo",
+      "lines": true,
+      "fill": 1,
+      "linewidth": 2,
+      "nullPointMode": "null"
     },
     {
       "id": 14,
       "title": "Latencia P95 HTTP",
       "type": "graph",
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 56},
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 56
+      },
       "targets": [
         {
           "expr": "histogram_quantile(0.95, rate(http_server_requests_seconds_bucket{app=\"web-server-vt\"}[1m]))",
@@ -364,16 +582,30 @@
         }
       ],
       "yaxes": [
-        {"format": "s", "label": "Latencia"},
-        {"format": "short"}
+        {
+          "format": "s",
+          "label": "Latencia"
+        },
+        {
+          "format": "short"
+        }
       ],
-      "description": "Percentil 95 de latencia HTTP. El 95% de las peticiones responden por debajo de este valor. Con virtual threads debe mantenerse estable bajo carga"
+      "description": "Percentil 95 de latencia HTTP. El 95% de las peticiones responden por debajo de este valor. Con virtual threads debe mantenerse estable bajo carga",
+      "lines": true,
+      "fill": 1,
+      "linewidth": 2,
+      "nullPointMode": "null"
     },
     {
       "id": 15,
       "title": "Latencia P99 HTTP",
       "type": "graph",
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 56},
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 56
+      },
       "targets": [
         {
           "expr": "histogram_quantile(0.99, rate(http_server_requests_seconds_bucket{app=\"web-server-vt\"}[1m]))",
@@ -387,16 +619,30 @@
         }
       ],
       "yaxes": [
-        {"format": "s", "label": "Latencia"},
-        {"format": "short"}
+        {
+          "format": "s",
+          "label": "Latencia"
+        },
+        {
+          "format": "short"
+        }
       ],
-      "description": "Percentil 99 de latencia HTTP (cola larga). Con virtual threads no hay thread starvation, por lo que este valor no se dispara bajo carga a diferencia de los hilos de plataforma"
+      "description": "Percentil 99 de latencia HTTP (cola larga). Con virtual threads no hay thread starvation, por lo que este valor no se dispara bajo carga a diferencia de los hilos de plataforma",
+      "lines": true,
+      "fill": 1,
+      "linewidth": 2,
+      "nullPointMode": "null"
     },
     {
       "id": 16,
       "title": "Tasa de Errores HTTP (%)",
       "type": "graph",
-      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 64},
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 64
+      },
       "targets": [
         {
           "expr": "rate(http_server_requests_seconds_count{app=\"web-server-vt\",status=~\"5..\"}[1m]) / rate(http_server_requests_seconds_count{app=\"web-server-vt\"}[1m]) * 100",
@@ -415,15 +661,35 @@
         }
       ],
       "yaxes": [
-        {"format": "percent", "label": "Errores %", "min": 0},
-        {"format": "short"}
+        {
+          "format": "percent",
+          "label": "Errores %",
+          "min": 0
+        },
+        {
+          "format": "short"
+        }
       ],
-      "description": "Tasa de errores HTTP. Con virtual threads no hay rechazo de peticiones por pool agotado, a diferencia de los hilos de plataforma donde los errores suben cuando el pool se satura"
+      "description": "Tasa de errores HTTP. Con virtual threads no hay rechazo de peticiones por pool agotado, a diferencia de los hilos de plataforma donde los errores suben cuando el pool se satura",
+      "lines": true,
+      "fill": 1,
+      "linewidth": 2,
+      "nullPointMode": "null"
     }
   ],
-  "time": {"from": "now-1h", "to": "now"},
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
   "timepicker": {
-    "refresh_intervals": ["5s", "10s", "30s", "1m", "5m", "15m"]
+    "refresh_intervals": [
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m"
+    ]
   },
   "refresh": "5s",
   "schemaVersion": 16,

@@ -6,7 +6,7 @@ server:
   port: 8080
   tomcat:
     threads:
-      max: 50
+      max: 500
 
 # Actuator configuration
 management:
@@ -21,9 +21,6 @@ management:
     prometheus:
       enabled: true
   metrics:
-    export:
-      prometheus:
-        enabled: true
     tags:
       application: ${spring.application.name}
       thread_type: platform
@@ -32,13 +29,10 @@ management:
         http.server.requests: true
       slo:
         http.server.requests: 50ms,100ms,200ms,500ms,1s,2s,5s
-
-# Thread pool configuration
-thread-pool:
-  core-size: 50
-  max-size: 200
-  queue-capacity: 1000
-  thread-name-prefix: platform-thread-
+  prometheus:
+    metrics:
+      export:
+        enabled: true
 
 # Logging
 logging:

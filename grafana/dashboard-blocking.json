@@ -1,7 +1,15 @@
 {
   "uid": "jvm-threads-blocking",
   "title": "Monitoreo JVM y Comparación de Hilos - Versiones Bloqueantes",
-  "tags": ["java", "jvm", "metrics", "monitoring", "threads", "performance", "blocking"],
+  "tags": [
+    "java",
+    "jvm",
+    "metrics",
+    "monitoring",
+    "threads",
+    "performance",
+    "blocking"
+  ],
   "timezone": "browser",
   "editable": true,
   "panels": [
@@ -9,88 +17,136 @@
       "id": 1,
       "title": "jvm_memory_used_bytes{area=\"heap\"}",
       "type": "graph",
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
       "lines": true,
       "fill": 1,
       "linewidth": 2,
       "nullPointMode": "null",
       "targets": [
         {
-          "expr": "jvm_memory_used_bytes{area=\"heap\",app=\"web-server-blocking\"}",
-          "legendFormat": "Memoria Heap Utilizada - web-server-blocking",
+          "expr": "sum by (app) (jvm_memory_used_bytes{area=\"heap\",app=\"web-server-blocking\"})",
+          "legendFormat": "web-server-blocking - Heap Utilizada",
           "refId": "A"
         },
         {
-          "expr": "jvm_memory_used_bytes{area=\"heap\",app=\"web-client-blocking\"}",
-          "legendFormat": "Memoria Heap Utilizada - web-client-blocking",
+          "expr": "sum by (app) (jvm_memory_used_bytes{area=\"heap\",app=\"web-client-blocking\"})",
+          "legendFormat": "web-client-blocking - Heap Utilizada",
           "refId": "B"
         }
       ],
       "yaxes": [
-        {"format": "bytes", "label": "Memoria"},
-        {"format": "short"}
+        {
+          "format": "bytes",
+          "label": "Memoria"
+        },
+        {
+          "format": "short"
+        }
       ],
       "description": "Memoria heap utilizada por las aplicaciones bloqueantes (platform threads)"
     },
     {
       "id": 2,
-      "title": "jvm_memory_max_bytes{area=\"heap\"}",
+      "title": "Memoria Non-Heap Utilizada (Metaspace + Code Cache)",
       "type": "graph",
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
       "lines": true,
       "fill": 1,
       "linewidth": 2,
       "nullPointMode": "null",
       "targets": [
         {
-          "expr": "jvm_memory_max_bytes{area=\"heap\",app=\"web-server-blocking\"}",
-          "legendFormat": "Memoria Heap Máxima - web-server-blocking",
+          "expr": "sum by (app) (jvm_memory_used_bytes{area=\"nonheap\",app=\"web-server-blocking\"})",
+          "legendFormat": "web-server-blocking - Non-Heap",
           "refId": "A"
         },
         {
-          "expr": "jvm_memory_max_bytes{area=\"heap\",app=\"web-client-blocking\"}",
-          "legendFormat": "Memoria Heap Máxima - web-client-blocking",
+          "expr": "sum by (app) (jvm_memory_used_bytes{area=\"nonheap\",app=\"web-client-blocking\"})",
+          "legendFormat": "web-client-blocking - Non-Heap",
           "refId": "B"
         }
       ],
       "yaxes": [
-        {"format": "bytes", "label": "Memoria"},
-        {"format": "short"}
+        {
+          "format": "bytes",
+          "label": "Memoria"
+        },
+        {
+          "format": "short"
+        }
       ],
-      "description": "Memoria heap máxima configurada"
+      "description": "Memoria fuera del heap: Metaspace, Code Cache, Compressed Class Space"
     },
     {
       "id": 3,
       "title": "(jvm_memory_used_bytes{area=\"heap\"} / jvm_memory_max_bytes{area=\"heap\"}) * 100",
       "type": "graph",
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
       "lines": true,
       "fill": 1,
       "linewidth": 2,
       "nullPointMode": "null",
       "targets": [
         {
-          "expr": "(jvm_memory_used_bytes{area=\"heap\",app=\"web-server-blocking\"} / jvm_memory_max_bytes{area=\"heap\",app=\"web-server-blocking\"}) * 100",
-          "legendFormat": "Porcentaje de Uso de Heap - web-server-blocking",
+          "expr": "(sum by (app) (jvm_memory_used_bytes{area=\"heap\",app=\"web-server-blocking\"}) / sum by (app) (jvm_memory_max_bytes{area=\"heap\",app=\"web-server-blocking\"})) * 100",
+          "legendFormat": "web-server-blocking - Uso Heap %",
           "refId": "A"
         },
         {
-          "expr": "(jvm_memory_used_bytes{area=\"heap\",app=\"web-client-blocking\"} / jvm_memory_max_bytes{area=\"heap\",app=\"web-client-blocking\"}) * 100",
-          "legendFormat": "Porcentaje de Uso de Heap - web-client-blocking",
+          "expr": "(sum by (app) (jvm_memory_used_bytes{area=\"heap\",app=\"web-client-blocking\"}) / sum by (app) (jvm_memory_max_bytes{area=\"heap\",app=\"web-client-blocking\"})) * 100",
+          "legendFormat": "web-client-blocking - Uso Heap %",
           "refId": "B"
         }
       ],
       "yaxes": [
-        {"format": "percent", "label": "Uso", "max": 100, "min": 0},
-        {"format": "short"}
+        {
+          "format": "percent",
+          "label": "Uso",
+          "max": 100,
+          "min": 0
+        },
+        {
+          "format": "short"
+        }
       ],
       "alert": {
         "conditions": [
           {
-            "evaluator": {"params": [85], "type": "gt"},
-            "operator": {"type": "and"},
-            "query": {"params": ["A", "5m", "now"]},
-            "reducer": {"params": [], "type": "avg"},
+            "evaluator": {
+              "params": [
+                85
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": [
+                "A",
+                "5m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "avg"
+            },
             "type": "query"
           }
         ],
@@ -100,36 +156,51 @@
     },
     {
       "id": 4,
-      "title": "process_resident_memory_bytes",
+      "title": "Memoria JVM Total (Heap + Non-Heap)",
       "type": "graph",
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
       "lines": true,
       "fill": 1,
       "linewidth": 2,
       "nullPointMode": "null",
       "targets": [
         {
-          "expr": "process_resident_memory_bytes{app=\"web-server-blocking\"}",
-          "legendFormat": "Memoria RSS del Proceso - web-server-blocking",
+          "expr": "sum by (app) (jvm_memory_used_bytes{app=\"web-server-blocking\"})",
+          "legendFormat": "web-server-blocking - Heap + Non-Heap",
           "refId": "A"
         },
         {
-          "expr": "process_resident_memory_bytes{app=\"web-client-blocking\"}",
-          "legendFormat": "Memoria RSS del Proceso - web-client-blocking",
+          "expr": "sum by (app) (jvm_memory_used_bytes{app=\"web-client-blocking\"})",
+          "legendFormat": "web-client-blocking - Heap + Non-Heap",
           "refId": "B"
         }
       ],
       "yaxes": [
-        {"format": "bytes", "label": "Memoria"},
-        {"format": "short"}
+        {
+          "format": "bytes",
+          "label": "Memoria"
+        },
+        {
+          "format": "short"
+        }
       ],
-      "description": "Resident Set Size (RSS) - Memoria física utilizada por el proceso"
+      "description": "Memoria JVM total (heap + non-heap). No incluye stacks de OS threads (fuera del heap)"
     },
     {
       "id": 5,
       "title": "jvm_threads_live_threads",
       "type": "graph",
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16},
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 16
+      },
       "lines": true,
       "fill": 1,
       "linewidth": 2,
@@ -147,8 +218,13 @@
         }
       ],
       "yaxes": [
-        {"format": "short", "label": "Hilos"},
-        {"format": "short"}
+        {
+          "format": "short",
+          "label": "Hilos"
+        },
+        {
+          "format": "short"
+        }
       ],
       "description": "Total de hilos de plataforma vivos por aplicación"
     },
@@ -156,7 +232,12 @@
       "id": 6,
       "title": "jvm_threads_daemon_threads",
       "type": "graph",
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16},
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 16
+      },
       "lines": true,
       "fill": 1,
       "linewidth": 2,
@@ -174,8 +255,13 @@
         }
       ],
       "yaxes": [
-        {"format": "short", "label": "Hilos"},
-        {"format": "short"}
+        {
+          "format": "short",
+          "label": "Hilos"
+        },
+        {
+          "format": "short"
+        }
       ],
       "description": "Número de hilos daemon activos"
     },
@@ -183,7 +269,12 @@
       "id": 7,
       "title": "jvm_threads_states_threads",
       "type": "graph",
-      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 24},
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 24
+      },
       "lines": true,
       "fill": 1,
       "linewidth": 2,
@@ -231,8 +322,13 @@
         }
       ],
       "yaxes": [
-        {"format": "short", "label": "Hilos"},
-        {"format": "short"}
+        {
+          "format": "short",
+          "label": "Hilos"
+        },
+        {
+          "format": "short"
+        }
       ],
       "description": "Distribución de hilos de plataforma por estado (ejecutable, bloqueado, esperando)"
     },
@@ -240,7 +336,12 @@
       "id": 8,
       "title": "process_cpu_usage",
       "type": "graph",
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 32},
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 32
+      },
       "lines": true,
       "fill": 1,
       "linewidth": 2,
@@ -258,8 +359,15 @@
         }
       ],
       "yaxes": [
-        {"format": "percentunit", "label": "CPU", "max": 1, "min": 0},
-        {"format": "short"}
+        {
+          "format": "percentunit",
+          "label": "CPU",
+          "max": 1,
+          "min": 0
+        },
+        {
+          "format": "short"
+        }
       ],
       "description": "Porcentaje de uso de CPU por aplicación"
     },
@@ -267,7 +375,12 @@
       "id": 9,
       "title": "system_cpu_usage",
       "type": "graph",
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 32},
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 32
+      },
       "lines": true,
       "fill": 1,
       "linewidth": 2,
@@ -285,8 +398,15 @@
         }
       ],
       "yaxes": [
-        {"format": "percentunit", "label": "CPU", "max": 1, "min": 0},
-        {"format": "short"}
+        {
+          "format": "percentunit",
+          "label": "CPU",
+          "max": 1,
+          "min": 0
+        },
+        {
+          "format": "short"
+        }
       ],
       "description": "Uso de CPU del sistema operativo"
     },
@@ -294,7 +414,12 @@
       "id": 10,
       "title": "rate(http_server_requests_seconds_count[1m])",
       "type": "graph",
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 40},
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 40
+      },
       "lines": true,
       "fill": 1,
       "linewidth": 2,
@@ -312,8 +437,13 @@
         }
       ],
       "yaxes": [
-        {"format": "reqps", "label": "Peticiones/seg"},
-        {"format": "short"}
+        {
+          "format": "reqps",
+          "label": "Peticiones/seg"
+        },
+        {
+          "format": "short"
+        }
       ],
       "description": "Tasa de peticiones HTTP procesadas por segundo"
     },
@@ -321,7 +451,12 @@
       "id": 11,
       "title": "rate(http_server_requests_seconds_sum[1m]) / rate(http_server_requests_seconds_count[1m])",
       "type": "graph",
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 40},
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 40
+      },
       "lines": true,
       "fill": 1,
       "linewidth": 2,
@@ -339,8 +474,13 @@
         }
       ],
       "yaxes": [
-        {"format": "s", "label": "Latencia"},
-        {"format": "short"}
+        {
+          "format": "s",
+          "label": "Latencia"
+        },
+        {
+          "format": "short"
+        }
       ],
       "description": "Latencia media de respuesta HTTP"
     },
@@ -348,7 +488,12 @@
       "id": 12,
       "title": "rate(jvm_gc_pause_seconds_sum[1m])",
       "type": "graph",
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 48},
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 48
+      },
       "lines": true,
       "fill": 1,
       "linewidth": 2,
@@ -366,8 +511,13 @@
         }
       ],
       "yaxes": [
-        {"format": "s", "label": "Tiempo de GC"},
-        {"format": "short"}
+        {
+          "format": "s",
+          "label": "Tiempo de GC"
+        },
+        {
+          "format": "short"
+        }
       ],
       "description": "Tasa de tiempo consumido por el Garbage Collector"
     },
@@ -375,7 +525,12 @@
       "id": 13,
       "title": "rate(jvm_gc_pause_seconds_count[1m])",
       "type": "graph",
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 48},
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 48
+      },
       "lines": true,
       "fill": 1,
       "linewidth": 2,
@@ -393,15 +548,30 @@
         }
       ],
       "yaxes": [
-        {"format": "ops", "label": "GC/seg"},
-        {"format": "short"}
+        {
+          "format": "ops",
+          "label": "GC/seg"
+        },
+        {
+          "format": "short"
+        }
       ],
       "description": "Frecuencia de ejecuciones del Garbage Collector por segundo"
     }
   ],
-  "time": {"from": "now-1h", "to": "now"},
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
   "timepicker": {
-    "refresh_intervals": ["5s", "10s", "30s", "1m", "5m", "15m"]
+    "refresh_intervals": [
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m"
+    ]
   },
   "refresh": "5s",
   "schemaVersion": 16,
