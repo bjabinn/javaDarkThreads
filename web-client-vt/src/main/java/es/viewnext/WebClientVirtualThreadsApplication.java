@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class WebClientBlockingApplication {
+public class WebClientVirtualThreadsApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(WebClientBlockingApplication.class, args);
+		SpringApplication.run(WebClientVirtualThreadsApplication.class, args);
 	}
 
 }

@@ -17,7 +17,7 @@ public class OpenApiConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("Web Server API - Codemotion")
+                        .title("Web-server Platform Threads (Blocking)")
                         .version("1.0.0")
                         .description("API del servidor web con métricas de OpenTelemetry y Prometheus para la charla de Codemotion")
                         .contact(new Contact()

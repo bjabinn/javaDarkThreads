@@ -42,6 +42,12 @@
 			<version>2.3.0</version>
 		</dependency>
 
+		<!-- Apache HttpClient 5 (connection pooling for virtual threads) -->
+		<dependency>
+			<groupId>org.apache.httpcomponents.client5</groupId>
+			<artifactId>httpclient5</artifactId>
+		</dependency>
+
 		<!-- Spring Boot Test -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

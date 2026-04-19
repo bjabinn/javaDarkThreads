@@ -175,8 +175,6 @@ public class PlatformThreadLoadGeneratorService {
                                       requestNum, response.getStatusCode(), targetUrl);
                         }
                     } catch (RestClientException e) {
-                        failureCount.incrementAndGet();
-                        failureCounter.increment();
                         logger.error("Request #{} failed to call: {}", requestNum, targetUrl, e);
                         throw e; // Re-throw to be caught by outer catch block
                     }

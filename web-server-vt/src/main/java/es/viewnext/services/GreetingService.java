@@ -20,9 +20,15 @@ public class GreetingService {
      * @return GreetingResponse con el mensaje y timestamp en formato YYYYMMDDHHmmss
      */
     public GreetingResponse generateGreeting() {
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
         String message = "Hola Codemotion";
         String timestamp = LocalDateTime.now().format(TIMESTAMP_FORMATTER);
-        
+
         return new GreetingResponse(message, timestamp);
     }
 }

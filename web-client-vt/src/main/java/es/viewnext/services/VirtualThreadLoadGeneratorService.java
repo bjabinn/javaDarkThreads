@@ -62,7 +62,6 @@ public class VirtualThreadLoadGeneratorService {
         
         LoadResponse response = new LoadResponse();
         response.setTotalRequests(request.getRequests());
-        response.setThreadsUsed(request.getThreads());
         response.setStartTime(LocalDateTime.now());
         
         // Create thread pool with virtual threads
@@ -172,8 +171,6 @@ public class VirtualThreadLoadGeneratorService {
                                       requestNum, response.getStatusCode(), targetUrl);
                         }
                     } catch (RestClientException e) {
-                        failureCount.incrementAndGet();
-                        failureCounter.increment();
                         logger.error("Request #{} failed to call: {}", requestNum, targetUrl, e);
                         throw e; // Re-throw to be caught by outer catch block
                     }

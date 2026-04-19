@@ -17,9 +17,9 @@ public class OpenApiConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("Platform Threads PoC API")
+                        .title("Client-VirtualThreads")
                         .version("1.0.0")
-                        .description("API para pruebas de rendimiento con Platform Threads y OpenTelemetry")
+                        .description("API para pruebas de rendimiento con Virtual Threads y OpenTelemetry")
                         .contact(new Contact()
                                 .name("Viewnext")
                                 .email("info@viewnext.com"))
@@ -28,10 +28,10 @@ public class OpenApiConfig {
                                 .url("https://www.apache.org/licenses/LICENSE-2.0.html")))
                 .servers(List.of(
                         new Server()
-                                .url("http://localhost:8080")
+                                .url("http://localhost:8095")
                                 .description("Local server"),
                         new Server()
-                                .url("http://localhost:8080")
+                                .url("http://localhost:8095")
                                 .description("Docker container")
                 ));
     }
