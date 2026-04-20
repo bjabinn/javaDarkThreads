@@ -64,7 +64,7 @@ public class VirtualThreadLoadGeneratorService {
         response.setTotalRequests(request.getRequests());
         response.setStartTime(LocalDateTime.now());
         
-        // Create thread pool with virtual threads
+        // Se crea un pol de hilos virtuales
         ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
         
         List<Future<Long>> futures = new ArrayList<>();
