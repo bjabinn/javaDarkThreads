@@ -34,7 +34,6 @@ management:
       export:
         enabled: true
 
-# Logging
 logging:
   level:
     root: INFO
@@ -42,7 +41,7 @@ logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
 
-# SpringDoc OpenAPI (Swagger) configuration
+#Swagger configuration
 springdoc:
   api-docs:
     path: /api-docs

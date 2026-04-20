@@ -16,7 +16,7 @@
   "panels": [
     {
       "id": 1,
-      "title": "Memoria Heap Utilizada",
+      "title": "jvm_memory_used_bytes{area=\"heap\"}",
       "type": "graph",
       "gridPos": {
         "h": 8,
@@ -90,7 +90,7 @@
     },
     {
       "id": 3,
-      "title": "Porcentaje de Uso de Heap",
+      "title": "(jvm_memory_used_bytes{area=\"heap\"} / jvm_memory_max_bytes{area=\"heap\"}) * 100",
       "type": "graph",
       "gridPos": {
         "h": 8,
@@ -147,7 +147,7 @@
             "type": "query"
           }
         ],
-        "name": "Alerta de Uso Alto de Heap - VT"
+        "name": "Alerta de Uso Alto de Heap"
       },
       "description": "Porcentaje de uso de memoria heap. Alerta cuando supera el 85%",
       "lines": true,
@@ -194,7 +194,7 @@
     },
     {
       "id": 5,
-      "title": "Hilos Vivos por Aplicación",
+      "title": "jvm_threads_live_threads",
       "type": "graph",
       "gridPos": {
         "h": 8,
@@ -205,12 +205,12 @@
       "targets": [
         {
           "expr": "jvm_threads_live_threads{app=\"web-server-vt\"}",
-          "legendFormat": "web-server-vt - Hilos Vivos",
+          "legendFormat": "Hilos Vivos por Aplicación - web-server-vt",
           "refId": "A"
         },
         {
           "expr": "jvm_threads_live_threads{app=\"web-client-vt\"}",
-          "legendFormat": "web-client-vt - Hilos Vivos",
+          "legendFormat": "Hilos Vivos por Aplicación - web-client-vt",
           "refId": "B"
         }
       ],
@@ -231,7 +231,7 @@
     },
     {
       "id": 6,
-      "title": "Hilos Daemon",
+      "title": "jvm_threads_daemon_threads",
       "type": "graph",
       "gridPos": {
         "h": 8,
@@ -242,12 +242,12 @@
       "targets": [
         {
           "expr": "jvm_threads_daemon_threads{app=\"web-server-vt\"}",
-          "legendFormat": "web-server-vt - Hilos Daemon",
+          "legendFormat": "Hilos Daemon - web-server-vt",
           "refId": "A"
         },
         {
           "expr": "jvm_threads_daemon_threads{app=\"web-client-vt\"}",
-          "legendFormat": "web-client-vt - Hilos Daemon",
+          "legendFormat": "Hilos Daemon - web-client-vt",
           "refId": "B"
         }
       ],
@@ -268,7 +268,7 @@
     },
     {
       "id": 7,
-      "title": "Hilos por Estado",
+      "title": "jvm_threads_states_threads",
       "type": "graph",
       "gridPos": {
         "h": 8,
@@ -279,42 +279,42 @@
       "targets": [
         {
           "expr": "jvm_threads_states_threads{app=\"web-server-vt\",state=\"runnable\"}",
-          "legendFormat": "web-server-vt - Ejecutable",
+          "legendFormat": "Hilos por Estado - web-server-vt - runnable",
           "refId": "A"
         },
         {
           "expr": "jvm_threads_states_threads{app=\"web-server-vt\",state=\"blocked\"}",
-          "legendFormat": "web-server-vt - Bloqueado",
+          "legendFormat": "Hilos por Estado - web-server-vt - blocked",
           "refId": "B"
         },
         {
           "expr": "jvm_threads_states_threads{app=\"web-server-vt\",state=\"waiting\"}",
-          "legendFormat": "web-server-vt - Esperando",
+          "legendFormat": "Hilos por Estado - web-server-vt - waiting",
           "refId": "C"
         },
         {
           "expr": "jvm_threads_states_threads{app=\"web-server-vt\",state=\"timed-waiting\"}",
-          "legendFormat": "web-server-vt - Esperando con Tiempo",
+          "legendFormat": "Hilos por Estado - web-server-vt - timed-waiting",
           "refId": "D"
         },
         {
           "expr": "jvm_threads_states_threads{app=\"web-client-vt\",state=\"runnable\"}",
-          "legendFormat": "web-client-vt - Ejecutable",
+          "legendFormat": "Hilos por Estado - web-client-vt - runnable",
           "refId": "E"
         },
         {
           "expr": "jvm_threads_states_threads{app=\"web-client-vt\",state=\"blocked\"}",
-          "legendFormat": "web-client-vt - Bloqueado",
+          "legendFormat": "Hilos por Estado - web-client-vt - blocked",
           "refId": "F"
         },
         {
           "expr": "jvm_threads_states_threads{app=\"web-client-vt\",state=\"waiting\"}",
-          "legendFormat": "web-client-vt - Esperando",
+          "legendFormat": "Hilos por Estado - web-client-vt - waiting",
           "refId": "G"
         },
         {
           "expr": "jvm_threads_states_threads{app=\"web-client-vt\",state=\"timed-waiting\"}",
-          "legendFormat": "web-client-vt - Esperando con Tiempo",
+          "legendFormat": "Hilos por Estado - web-client-vt - timed-waiting",
           "refId": "H"
         }
       ],
@@ -335,7 +335,7 @@
     },
     {
       "id": 8,
-      "title": "Uso de CPU por Aplicación",
+      "title": "process_cpu_usage",
       "type": "graph",
       "gridPos": {
         "h": 8,
@@ -346,12 +346,12 @@
       "targets": [
         {
           "expr": "process_cpu_usage{app=\"web-server-vt\"}",
-          "legendFormat": "web-server-vt - Uso de CPU",
+          "legendFormat": "Uso de CPU por Aplicación - web-server-vt",
           "refId": "A"
         },
         {
           "expr": "process_cpu_usage{app=\"web-client-vt\"}",
-          "legendFormat": "web-client-vt - Uso de CPU",
+          "legendFormat": "Uso de CPU por Aplicación - web-client-vt",
           "refId": "B"
         }
       ],
@@ -374,7 +374,7 @@
     },
     {
       "id": 9,
-      "title": "Tiempo de CPU del Sistema",
+      "title": "system_cpu_usage",
       "type": "graph",
       "gridPos": {
         "h": 8,
@@ -385,12 +385,12 @@
       "targets": [
         {
           "expr": "system_cpu_usage{app=\"web-server-vt\"}",
-          "legendFormat": "web-server-vt - CPU Sistema",
+          "legendFormat": "Tiempo de CPU del Sistema - web-server-vt",
           "refId": "A"
         },
         {
           "expr": "system_cpu_usage{app=\"web-client-vt\"}",
-          "legendFormat": "web-client-vt - CPU Sistema",
+          "legendFormat": "Tiempo de CPU del Sistema - web-client-vt",
           "refId": "B"
         }
       ],
@@ -413,7 +413,7 @@
     },
     {
       "id": 10,
-      "title": "Throughput HTTP (Peticiones/seg)",
+      "title": "rate(http_server_requests_seconds_count[1m])",
       "type": "graph",
       "gridPos": {
         "h": 8,
@@ -424,12 +424,12 @@
       "targets": [
         {
           "expr": "rate(http_server_requests_seconds_count{app=\"web-server-vt\"}[1m])",
-          "legendFormat": "web-server-vt - Peticiones/seg",
+          "legendFormat": "Throughput HTTP (Peticiones/seg) - web-server-vt",
           "refId": "A"
         },
         {
           "expr": "rate(http_server_requests_seconds_count{app=\"web-client-vt\"}[1m])",
-          "legendFormat": "web-client-vt - Peticiones/seg",
+          "legendFormat": "Throughput HTTP (Peticiones/seg) - web-client-vt",
           "refId": "B"
         }
       ],
@@ -450,7 +450,7 @@
     },
     {
       "id": 11,
-      "title": "Latencia Media de Respuesta HTTP",
+      "title": "rate(http_server_requests_seconds_sum[1m]) / rate(http_server_requests_seconds_count[1m])",
       "type": "graph",
       "gridPos": {
         "h": 8,
@@ -461,12 +461,12 @@
       "targets": [
         {
           "expr": "rate(http_server_requests_seconds_sum{app=\"web-server-vt\"}[1m]) / rate(http_server_requests_seconds_count{app=\"web-server-vt\"}[1m])",
-          "legendFormat": "web-server-vt - Latencia Media",
+          "legendFormat": "Latencia Media de Respuesta HTTP - web-server-vt",
           "refId": "A"
         },
         {
           "expr": "rate(http_server_requests_seconds_sum{app=\"web-client-vt\"}[1m]) / rate(http_server_requests_seconds_count{app=\"web-client-vt\"}[1m])",
-          "legendFormat": "web-client-vt - Latencia Media",
+          "legendFormat": "Latencia Media de Respuesta HTTP - web-client-vt",
           "refId": "B"
         }
       ],
@@ -487,7 +487,7 @@
     },
     {
       "id": 12,
-      "title": "Tasa de Garbage Collection",
+      "title": "rate(jvm_gc_pause_seconds_sum[1m])",
       "type": "graph",
       "gridPos": {
         "h": 8,
@@ -498,12 +498,12 @@
       "targets": [
         {
           "expr": "rate(jvm_gc_pause_seconds_sum{app=\"web-server-vt\"}[1m])",
-          "legendFormat": "web-server-vt - Tasa de GC",
+          "legendFormat": "Tasa de Garbage Collection - web-server-vt",
           "refId": "A"
         },
         {
           "expr": "rate(jvm_gc_pause_seconds_sum{app=\"web-client-vt\"}[1m])",
-          "legendFormat": "web-client-vt - Tasa de GC",
+          "legendFormat": "Tasa de Garbage Collection - web-client-vt",
           "refId": "B"
         }
       ],
@@ -524,7 +524,7 @@
     },
     {
       "id": 13,
-      "title": "Conteo de Recolecciones de Basura",
+      "title": "rate(jvm_gc_pause_seconds_count[1m])",
       "type": "graph",
       "gridPos": {
         "h": 8,
@@ -535,12 +535,12 @@
       "targets": [
         {
           "expr": "rate(jvm_gc_pause_seconds_count{app=\"web-server-vt\"}[1m])",
-          "legendFormat": "web-server-vt - Recolecciones/seg",
+          "legendFormat": "Conteo de Recolecciones de Basura - web-server-vt",
           "refId": "A"
         },
         {
           "expr": "rate(jvm_gc_pause_seconds_count{app=\"web-client-vt\"}[1m])",
-          "legendFormat": "web-client-vt - Recolecciones/seg",
+          "legendFormat": "Conteo de Recolecciones de Basura - web-client-vt",
           "refId": "B"
         }
       ],
@@ -554,123 +554,6 @@
         }
       ],
       "description": "Frecuencia de ejecuciones del Garbage Collector por segundo",
-      "lines": true,
-      "fill": 1,
-      "linewidth": 2,
-      "nullPointMode": "null"
-    },
-    {
-      "id": 14,
-      "title": "Latencia P95 HTTP",
-      "type": "graph",
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 56
-      },
-      "targets": [
-        {
-          "expr": "histogram_quantile(0.95, rate(http_server_requests_seconds_bucket{app=\"web-server-vt\"}[1m]))",
-          "legendFormat": "web-server-vt - P95",
-          "refId": "A"
-        },
-        {
-          "expr": "histogram_quantile(0.95, rate(http_server_requests_seconds_bucket{app=\"web-client-vt\"}[1m]))",
-          "legendFormat": "web-client-vt - P95",
-          "refId": "B"
-        }
-      ],
-      "yaxes": [
-        {
-          "format": "s",
-          "label": "Latencia"
-        },
-        {
-          "format": "short"
-        }
-      ],
-      "description": "Percentil 95 de latencia HTTP. El 95% de las peticiones responden por debajo de este valor. Con virtual threads debe mantenerse estable bajo carga",
-      "lines": true,
-      "fill": 1,
-      "linewidth": 2,
-      "nullPointMode": "null"
-    },
-    {
-      "id": 15,
-      "title": "Latencia P99 HTTP",
-      "type": "graph",
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 56
-      },
-      "targets": [
-        {
-          "expr": "histogram_quantile(0.99, rate(http_server_requests_seconds_bucket{app=\"web-server-vt\"}[1m]))",
-          "legendFormat": "web-server-vt - P99",
-          "refId": "A"
-        },
-        {
-          "expr": "histogram_quantile(0.99, rate(http_server_requests_seconds_bucket{app=\"web-client-vt\"}[1m]))",
-          "legendFormat": "web-client-vt - P99",
-          "refId": "B"
-        }
-      ],
-      "yaxes": [
-        {
-          "format": "s",
-          "label": "Latencia"
-        },
-        {
-          "format": "short"
-        }
-      ],
-      "description": "Percentil 99 de latencia HTTP (cola larga). Con virtual threads no hay thread starvation, por lo que este valor no se dispara bajo carga a diferencia de los hilos de plataforma",
-      "lines": true,
-      "fill": 1,
-      "linewidth": 2,
-      "nullPointMode": "null"
-    },
-    {
-      "id": 16,
-      "title": "Tasa de Errores HTTP (%)",
-      "type": "graph",
-      "gridPos": {
-        "h": 8,
-        "w": 24,
-        "x": 0,
-        "y": 64
-      },
-      "targets": [
-        {
-          "expr": "rate(http_server_requests_seconds_count{app=\"web-server-vt\",status=~\"5..\"}[1m]) / rate(http_server_requests_seconds_count{app=\"web-server-vt\"}[1m]) * 100",
-          "legendFormat": "web-server-vt - Errores 5xx %",
-          "refId": "A"
-        },
-        {
-          "expr": "rate(http_server_requests_seconds_count{app=\"web-client-vt\",status=~\"5..\"}[1m]) / rate(http_server_requests_seconds_count{app=\"web-client-vt\"}[1m]) * 100",
-          "legendFormat": "web-client-vt - Errores 5xx %",
-          "refId": "B"
-        },
-        {
-          "expr": "rate(load_requests_failure_total{app=\"web-client-vt\"}[1m]) / rate(load_requests_total_total{app=\"web-client-vt\"}[1m]) * 100",
-          "legendFormat": "web-client-vt - Fallos de carga %",
-          "refId": "C"
-        }
-      ],
-      "yaxes": [
-        {
-          "format": "percent",
-          "label": "Errores %",
-          "min": 0
-        },
-        {
-          "format": "short"
-        }
-      ],
-      "description": "Tasa de errores HTTP. Con virtual threads no hay rechazo de peticiones por pool agotado, a diferencia de los hilos de plataforma donde los errores suben cuando el pool se satura",
       "lines": true,
       "fill": 1,
       "linewidth": 2,

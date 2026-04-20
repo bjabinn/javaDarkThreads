@@ -15,17 +15,16 @@ management:
   endpoint:
     health:
       show-details: always
-    prometheus:
-      enabled: true
-  metrics:
-    export:
-      prometheus:
+  prometheus:
+    metrics:
+      export:
         enabled: true
+  metrics:
     tags:
       application: ${spring.application.name}
     distribution:
       percentiles-histogram:
-        http.server.requests: true
+        "[http.server.requests]": true
 
 # SpringDoc OpenAPI (Swagger) configuration
 springdoc:

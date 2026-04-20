@@ -25,7 +25,7 @@ public class GreetingController {
         this.greetingService = greetingService;
     }
     
-    @GetMapping("/greeting-reactive")
+    @GetMapping("/greeting")
     @Operation(
         summary = "Obtener saludo de Codemotion (Reactivo)",
         description = "Devuelve un mensaje 'Hola Codemotion' con el timestamp actual de forma reactiva con delay de 2 segundos"

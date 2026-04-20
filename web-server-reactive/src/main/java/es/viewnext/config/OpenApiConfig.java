@@ -17,7 +17,7 @@ public class OpenApiConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("Web Server API - Codemotion")
+                        .title("Web Server Reactivo")
                         .version("1.0.0")
                         .description("API del servidor web con métricas de OpenTelemetry y Prometheus para la charla de Codemotion")
                         .contact(new Contact()
@@ -28,10 +28,10 @@ public class OpenApiConfig {
                                 .url("https://www.apache.org/licenses/LICENSE-2.0.html")))
                 .servers(List.of(
                         new Server()
-                                .url("http://localhost:8081")
+                                .url("http://localhost:8091")
                                 .description("Local server"),
                         new Server()
-                                .url("http://localhost:8081")
+                                .url("http://localhost:8091")
                                 .description("Docker container")
                 ));
     }

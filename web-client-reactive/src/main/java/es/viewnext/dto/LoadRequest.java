@@ -3,15 +3,15 @@ package es.viewnext.dto;
 public class LoadRequest {
 
     private int requests = 100;
-    private int threads = 10;
+    private int concurrency = 10;
     private String targetUrl;
 
     public LoadRequest() {
     }
 
-    public LoadRequest(int requests, int threads) {
+    public LoadRequest(int requests, int concurrency) {
         this.requests = requests;
-        this.threads = threads;
+        this.concurrency = concurrency;
     }
 
     // Getters and Setters
@@ -24,12 +24,12 @@ public class LoadRequest {
         this.requests = requests;
     }
 
-    public int getThreads() {
-        return threads;
+    public int getConcurrency() {
+        return concurrency;
     }
 
-    public void setThreads(int threads) {
-        this.threads = threads;
+    public void setConcurrency(int concurrency) {
+        this.concurrency = concurrency;
     }
 
     public String getTargetUrl() {
@@ -44,7 +44,7 @@ public class LoadRequest {
     public String toString() {
         return "LoadRequest{" +
                 "requests=" + requests +
-                ", threads=" + threads +
+                ", concurrency=" + concurrency +
                 ", targetUrl='" + targetUrl + '\'' +
                 '}';
     }

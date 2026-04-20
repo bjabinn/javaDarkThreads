@@ -17,7 +17,7 @@ public class OpenApiConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("Platform Threads PoC API")
+                        .title("Cliente-reactivo")
                         .version("1.0.0")
                         .description("API para pruebas de rendimiento con Platform Threads y OpenTelemetry")
                         .contact(new Contact()
@@ -28,10 +28,10 @@ public class OpenApiConfig {
                                 .url("https://www.apache.org/licenses/LICENSE-2.0.html")))
                 .servers(List.of(
                         new Server()
-                                .url("http://localhost:8080")
+                                .url("http://localhost:8090")
                                 .description("Local server"),
                         new Server()
-                                .url("http://localhost:8080")
+                                .url("http://localhost:8090")
                                 .description("Docker container")
                 ));
     }

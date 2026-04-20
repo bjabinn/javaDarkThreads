@@ -61,7 +61,7 @@ public class ReactiveLoadGeneratorService {
         
         LoadResponse response = new LoadResponse();
         response.setTotalRequests(request.getRequests());
-        response.setThreadsUsed(request.getThreads());
+        response.setConcurrencyLevel(request.getConcurrency());
         response.setStartTime(LocalDateTime.now());
         
         AtomicInteger successCount = new AtomicInteger(0);
@@ -69,10 +69,9 @@ public class ReactiveLoadGeneratorService {
         
         long startTime = System.currentTimeMillis();
         
-        // Execute requests reactively using Flux
         return Flux.range(0, request.getRequests())
                 .flatMap(i -> executeReactiveRequest(i, request.getTargetUrl(), successCount, failureCount),
-                        request.getThreads()) // Concurrency level
+                        request.getConcurrency())
                 .collectList()
                 .map(responseTimes -> {
                     long endTime = System.currentTimeMillis();
@@ -91,11 +90,9 @@ public class ReactiveLoadGeneratorService {
                     response.setMinResponseTimeMs(stats.getMin());
                     response.setMaxResponseTimeMs(stats.getMax());
                     
-                    // Calculate throughput (requests per second)
                     double throughput = (double) request.getRequests() / (totalDuration / 1000.0);
                     response.setThroughput(throughput);
                     
-                    // Additional metrics
                     Map<String, Object> additionalMetrics = new HashMap<>();
                     additionalMetrics.put("activeThreads", Thread.activeCount());
                     additionalMetrics.put("totalThreads", Thread.getAllStackTraces().size());
@@ -121,8 +118,7 @@ public class ReactiveLoadGeneratorService {
         requestCounter.increment();
         
         Mono<Long> requestMono;
-        
-        // If targetUrl is provided, make real HTTP call
+
         if (targetUrl != null && !targetUrl.isEmpty()) {
             requestMono = webClient.get()
                     .uri(targetUrl)
@@ -136,7 +132,7 @@ public class ReactiveLoadGeneratorService {
                     .onErrorResume(WebClientResponseException.class, e -> {
                         failureCount.incrementAndGet();
                         failureCounter.increment();
-                        logger.warn("Request #{} received HTTP {} from {}", 
+                        logger.warn("Request #{} received HTTP {} from {}",
                                   requestNum, e.getStatusCode(), targetUrl);
                         return Mono.empty();
                     })
@@ -152,8 +148,10 @@ public class ReactiveLoadGeneratorService {
                         requestTimer.record(duration, java.util.concurrent.TimeUnit.MILLISECONDS);
                         return duration;
                     }));
+        } else {
+            requestMono = Mono.fromCallable(() -> (System.nanoTime() - start) / 1_000_000);
         }
-        
+
         return requestMono.onErrorResume(error -> {
             failureCount.incrementAndGet();
             failureCounter.increment();

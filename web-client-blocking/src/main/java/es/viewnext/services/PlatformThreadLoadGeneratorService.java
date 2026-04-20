@@ -65,7 +65,6 @@ public class PlatformThreadLoadGeneratorService {
         response.setThreadsUsed(request.getThreads());
         response.setStartTime(LocalDateTime.now());
         
-        // Create thread pool with platform threads
         ExecutorService executorService = Executors.newFixedThreadPool(request.getThreads(), r -> {
             Thread thread = new Thread(r);
             thread.setName("platform-thread-" + System.currentTimeMillis());
@@ -79,7 +78,6 @@ public class PlatformThreadLoadGeneratorService {
         long startTime = System.currentTimeMillis();
         
         try {
-            // Submit all tasks to the executor
             for (int i = 0; i < request.getRequests(); i++) {
                 final int requestNum = i;
                 Future<Long> future = executorService.submit(() -> {
@@ -88,7 +86,6 @@ public class PlatformThreadLoadGeneratorService {
                 futures.add(future);
             }
             
-            // Wait for all tasks to complete
             List<Long> responseTimes = new ArrayList<>();
             for (Future<Long> future : futures) {
                 try {
@@ -103,7 +100,6 @@ public class PlatformThreadLoadGeneratorService {
             long endTime = System.currentTimeMillis();
             long totalDuration = endTime - startTime;
             
-            // Calculate statistics
             LongSummaryStatistics stats = responseTimes.stream()
                     .mapToLong(Long::longValue)
                     .summaryStatistics();

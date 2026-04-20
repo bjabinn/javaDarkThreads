@@ -6,7 +6,7 @@ import java.util.Map;
 public class LoadResponse {
     
     private int totalRequests;
-    private int threadsUsed;
+    private int concurrencyLevel;
     private long totalDurationMs;
     private double throughput; // requests per second
     private double avgResponseTimeMs;
@@ -31,12 +31,12 @@ public class LoadResponse {
         this.totalRequests = totalRequests;
     }
     
-    public int getThreadsUsed() {
-        return threadsUsed;
+    public int getConcurrencyLevel() {
+        return concurrencyLevel;
     }
-    
-    public void setThreadsUsed(int threadsUsed) {
-        this.threadsUsed = threadsUsed;
+
+    public void setConcurrencyLevel(int concurrencyLevel) {
+        this.concurrencyLevel = concurrencyLevel;
     }
     
     public long getTotalDurationMs() {
