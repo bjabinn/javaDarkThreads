@@ -1,0 +1,462 @@
+Muchas gracias por venir. Segundo día a esta hora. Sabemos que sé que es duro. Yo he estado ahí muchas veces, así que
+una de la tarde. Muchas gracias. [risas] Bueno, pues eh ya la introducción. Vamos
+a hablar de concurrencia en en Java. La charla se llama Java Darart Frits,
+eh, digamos una continuación de un artículo que escribimos, se llamaba Java Dark Memory, eh, como una analogía de la
+materia oscura del universo que no se ve, pero está ahí y es muy difícil de medir la la memoria oscura de Java, la
+la que es difícil, la memoria nativa o hip, pues aquí va a hablar de de los hilos, de lo de lo que se ve, de lo que
+no se ve y de su importancia. Eh, bueno, como ya nos han presentado,
+eh, nos nos lo saltamos y [resoplido] vamos a empezar [carraspeo]
+por haber elegido esta charla y y hasta ahora que es que sé que es
+difícil, tenemos un premio para vosotros y es que no vamos a hablar de IA,
+[aplausos] ni una palabra ni de agentes
+arquitectura [risas] agtica. LM nada, cero. Vamos a hablar de de Java, así que
+espero que que la disfrutéis. Empezamos.
+Eh, como dice él dicho, caminamos a [resoplido] hombros de gigantes, ¿no?
+Aquí tenemos Strachi, Macarci, Corberó. En los años 60 fueron los precursores de
+las tareas compartidas de la compartición de de CPUs, cambio de contexto en CPUs para procesos en
+grandes mainframes. No eran threads, pero digamos que ese concepto de time
+sharing de de poder acceder usuarios a a un gran mainframe y compartir recursos,
+compartir memoria y CPU, fue el precursor de las tareas compartidas.
+Eh, el señor de barba del medio, que parece el arquitecto de Matrix, muchos
+lo reconoceréis, es John McCarcy.
+Voy a romper la promesa que acabo de hacer de no hablar de [risas] es Se le considera el padre de la IA. Ya
+está. Es la única referencia que voy a hacer a la IA. Avanzando un poco más en en el tiempo,
+Pisotski, un un gran ingeniero matemático, es el que ya teorizó sobre el concepto de de Threads, que fue
+madurando durante las décadas de los 60, 70. IBM escribió el primer sistema operativo P1 que implementaba realmente
+un concepto de tareas o o proceso ligero. Se pueden considerar quizá el primer sistema operativo que realmente
+trabaja de esta manera y después, finalmente, eh no necesita presentación
+Richard Stalman, eh proyecto GNU eh es
+el que puso las bases y diseñó lo que es el sistema POS de Threads en los años
+90, que es el que está vigente hasta hoy en día. Los hilos Linux que manejamos hoy en día, eh, se los tenemos que
+agradecir a él y pues puesto a a Torbals que los implementó en el sistema Linux.
+¿Qué es un thread? Muy sencillito, eh, la mínima ejecución para un proceso. Un
+proceso ejecuta tareas. Cuando tiene que ejecutar esas tareas, esas tareas, esas instrucciones se montan en un hilo y ese
+hilo se ejecuta. Eh, mínima unidad de ejecución. [grito ahogado] Un proceso puede tener muchos hilos.
+Todos los hilos comparten recursos con el proceso al que pertenecen. Esto es
+importante. Y el cambio de contexto, cuando monto, desmonto un hilo para trabajar, si los
+hilos son del mismo proceso, pues es algo muy rápido y ligero. No es lo mismo desmontar un proceso en CPO y montar
+otro que desmontar un hilo del mismo proceso y montar otro. Eso es un contest switching ligero. Por eso funcionan
+también. Todo esto lo tenemos implementado, como decía, en en Posic Ths Phrits, gracias a a Stalman.
+Internamente, ¿qué estructura eh tiene un Nilo? pues tiene su su ID, igual que
+un proceso tiene su process, un tiene su ID, tiene su estado, el contador de
+programas, es decir, el puntero que apunta la instrucción que estoy ejecutando, el puntero a la pila, al
+método, eh, y un enlace al al proceso padre al que pertenece al PCB. Todo eso está
+gobernado en esa estructura TCB. Todo esto es POSIX y apunta al PCB que es el
+programa de el bloque de control de proceso. [carraspeo] Lo dicho, comparten recursos con el con
+el proceso padre, intercambio ligero e en la CPU y
+comparten. Aquí lo vemos gráficamente, ¿vale? A la derecha tenemos el proceso,
+es decir, estructura compartida para todos los hilos. a la izquierda, estructura propia, memoria de un propio
+hilo. En el proceso tenemos toda la zona de stacks y cada vez que se crea un hilo, en esa zona de de stacks, se crea
+el stack del hilo y se y se apunta la dirección de memoria donde está almacenada. Después está el hip, no
+hipav, hip de proceso Linux, es decir, toda la memoria dinámica del proceso.
+Y después tenemos las arenas, que después vamos a hablar de ellas, que son son muy importantes para entender la
+memoria, la problemática de la gestión de la memoria con muchos thits. Y cada uno de los hilos pues tiene su propia su
+propia pila, el contador de programa, el puntero de pila y su ID de proceso. Esta
+es la estructura interna que tenemos. Ah,
+todo eso es posic. Vamos a ir metiendo ya Java en la ecuación, ¿vale? Eh,
+todavía no vamos a hablar de hilos virtuales, vamos a hablar de hilos tradicionales o hilos de plataforma.
+Cuando yo creo un objeto threed en Java y lo arranco,
+eh lo que está pasando por debajo es que se está llamando a esa instrucción en C propia de
+los JVM internas de la máquina virtual y eso está creando un hilo de plataforma,
+un FED en el sistema operativo, un POS Thed quiere decir esto
+que tenemos una correspondencia Uno a uno. Cuando yo creo un thread en Java, estoy creando un thread de
+plataforma, ¿vale? O sea, estoy delegando al sistema operativo la creación del thread, la
+gestión del thread, eh la gestión de su pila y los cambios
+de contexto que yo haga sobre él. ¿Vale? Esto es muy importante porque después vamos a ver con los virtuales que esta
+correspondencia uno a uno se rompe y es lo que nos permite incrementar
+exponencialmente el número de hilos que podemos manejar manejar en Java.
+Pregunta, aunque no veo mucho, por 1000. ¿Cuántos habéis trabajado con hilos virtuales?
+Cco se s Yo no veo con el foco, no veo nada. [risas] Dad un aplauso.
+Uno. Vale, poquito. Okay. [resoplido]
+Ah, vamos a ver las problemáticas que tenemos con los hilos de plataforma en
+este modelo, vamos a llamarle tradicional de de un hilo Java por un hilo de plataforma.
+Ah, sin entrar mucho en C y demás, no es el motivo de la charla,
+pero simplemente tener eh dos conceptos muy sencillos. Cada vez que alojamos
+memoria, cada vez que un nilo necesita memoria, va a utilizar eh GIPCE, el sistema locator de de
+memoria nativo del de Linux. Y esto va a utilizar dos funciones, MMAP para
+grandes estructuras de datos y BRK para pequeñas reservas dentro de esas estructuras.
+[grito ahogado] todos los espacios de memoria Java, aquí ya hablamos de Java, el espacio hip, el
+espacio de threads, donde están los stacks de threads que hemos visto en la imagen anterior, el espacio de clases,
+metaspace, el espacio de código donde trabaja el jit compiler y todo el resto de de subespacios ya más pequeñitos, el
+del GC, interna Symbols, aquí hay decenas, teníamos ahí todos estos se crean con Malock y MMA.
+Vale, [carraspeo] ahora vamos a ver el por qué os estoy contando esto. ¿Qué diréis? ¿Esto qué
+tiene que ver? Vamos a verlo. Vamos a verlo ahora. Eso de los pequeños, como los pequeños nosotros lo llamamos
+pequeños porque lo teníamos acotado. Sí. [risas] Era por diferenciarlo de los grandes, pues lo hemos bautizado como pequeños.
+Unos se pueden agrandar y cuando sumábamos todos los pequeños estaban aproximadamente 80 90 megas. Dejamos ahí
+pues los llamamos pequeños. Ya está. Sí. Bueno, depende del GC. Aquí como aquí estaría el espacio del GD. Si pones
+un jefe más más grande ya no es tan pequeño. [risas] Bueno,
+vamos a ver una secuencia de un hilo en ejecución eh para entender eh alguna de las
+problemáticas. Llega un hilo, se crea su stack, ¿vale? con Memory Map,
+con Malock se crea su stack en la zona de C stack del proceso. En ese stack
+están pues lo que hemos dicho, el puntero de programa, variables locales, etcétera.
+Eh, en la ejecución del hilo voy a crear objetos Java. Esos objetos Java van a ir
+al HIP Java compartido con todos los hilos en
+ejecución. Hemos dicho que comparte con el proceso. Irá al HIP Java, que es el hip del proceso Java.
+[resoplido] Ah. Para que poder instalos necesito la definición de sus clases, metaspace,
+todo eso ir al espacio de clases. Eso de nuevo va al hip del proceso Linux. En
+dentro de Java se divide en este subespacio, pero todo es hip Linux. Ya si está en compiler en en máquinas
+virtuales hotspot está continuamente optimizando nuestro código. Ah, lo met espacio de código.
+Si utilizo memory Mabid Files con Java se crean estructuras de memoria con mm
+diferentes a todas las anteriores. Ya estoy consumiendo memoria que inicialmente no he reservado.
+Y atención aquí que viene uno de los mayores problemas. Cada vez que llega un
+hilo y necesita ese hilo, normalmente va a ser una petición, una request, una response, está atendiendo una petición
+de de esto, un productor, un consumidor, JMS, Kafka, operaciones que necesitan entrada, salida, necesitan leer de
+kernel sockets del sistema operativo, ¿de acuerdo? Entonces, para poder hacer eso, [tos]
+Java va a utilizar lo que se llaman buffers, direct buffers, que son mapeos
+de de del socket de entrada o de salida con la memoria del proceso Java.
+¿Cómo se manejan estos buffers? Si el buffer es grande,
+después diremos qué significa lo de grande, se crea de nuevo una estructura con Mmm.
+Si el buffer es más pequeñito, que es lo más habitual, pues una Rqu response, un Jason de entrada, de salida, un productor consumidor Cafkas, más
+pequeñitos, esos buffers se meten en una estructura nueva de nuevo, ni thread, ni hip, ni
+class, ni code. Una nueva estructura que se llama arenas.
+¿Quiénes habéis oído hablar de las arenas? ¿Que sí o que no?
+Sí. ¿Quiénes sí habéis oído hablar de las arenas? poquitos. [resoplido] Pues atención a
+esto, eh, se crea esto. ¿Por qué? Porque el el
+alojador de memoria eh lo que intenta es que este hilo trabaje eh de una forma lo
+más ah independiente posible, sin pelear por recursos con otros. Entonces, se crea
+esta estructura y en esta estructura se copian los buffers de del sistema
+operativo sobre eh una estructura Java.
+Si llega a otro hilo y necesita utilizar 10 buffers para escribir, leer,
+se va a crear otra arena. Cada una de esas arenas en un sistema
+operativo Linux 64 bits puede llegar a tener 64 megas de tamaño máximo.
+[resoplido] ¿Y cuántas arenas podemos tener?
+ocho arenas [resoplido] por el número de CPUs
+visibles para el proceso Java por 64 meg. Si hacéis una cuenta rápida, os la hago
+yo, un proceso con ocho cores visibles, pues puede llegar a expandir 4 GB de
+arenas, ¿vale? y lo hará cuantos más hilos de
+plataforma lleguen. Tener muchos hilos significa mucha expansión de las arenas
+y muchos eh eh y mucha memoria eh gastada. ¿A cuántos trabajáis con Java en
+contenedores y se os ha caído el contenedor y no sabéis muy bien por qué es?
+Aquí sí que hay más manos levantadas al 90
+mucho por el motivo está en la expansión de las arenas que
+se puede controlar y limitar, pero eso os da eso lo podéis ver en el artículo en el artículo anterior, ¿no? Vamos a
+hablar de esto. [grito ahogado] La problemática aquí y cuantos más hilos de plataforma haya, más vamos a
+favorecer toda esa expansión de arenas. Vamos a empezar ya con
+hilos virtuales, eh, [resoplido] proyecto Lum,
+¿vale? Ah, la problemática de los hilos de plataforma la resumimos. Ah, son hilos
+pesados. Crear un hilo con con composios es pesado. Hay que crear todas esas estructuras, mantenerlas.
+Ah, tiene una escalvía alimentada, o sea, nuestros puls de conexiones pues son de 200, 300, no podemos ir mucho más
+allá. Cada uno de esos ah hilos de plataforma, su stack puede llegar a
+ocupar hasta 1 mega, o sea, 200 hilos, 200 megas más toda la memoria directa
+que reflejan las arenas. Problemas de escalabilidad. Su gestión
+está en el sistema operativo, no está en la máquina virtual Java. Y la gestión de la memoria es un
+problema por toda esa expansión que se hace. Y aquí viene el proyecto Lum. Aquí
+los los de mi generación sabéis que es esto. Los más jóvenes. [risas]
+Eh, Lum, eh, a ver, yo cuando vi que se
+acaban el proyecto Lumos dije, le han puesto el nombre por esto, que es un videojuego de los años 80, 90, un juego
+espectacular. Os lo recomiendo si no habéis jugado, pero no tiene nada que ver con el juego, pero bueno, una por
+poner la recomendación, revisitar las aventuras gráficas de los años 90 que son maravillosas.
+El proyecto Lum. Ah, su creador es Ron Preser. El nombre viene por un pueblo de
+Estados Unidos que se llama así, Lum, no viene por el videojuego, por desgracia. [grito ahogado]
+Y e, ¿qué es lo que pretende este proyecto? Ah,
+crear hilos más ligeros que permita que permita crear muchos más, ya no hablamos
+del orden de decenas o centenas, sino de millones de hilos y conseguir una
+concurrencia mucho más ligera. ¿Cómo se consigue esto?
+Vamos [resoplido] a a ver esta imagen. ¿Cómo se consigue esto? Se consigue eh
+creando objetos virtual thread, objetos Java. es gestionan directamente en la
+máquina virtual Java y después se crean unos pocos hilos de plataforma. En vez de ya crear un pool de 200 hilos de
+plataforma, solo creo un pool de unos pocos, ¿vale? Unos pocos que suele estar
+en proporción directa con la CPU visible. Pues si tengo ocho CPUs, creo ocho hilos de plataforma. Lo que voy
+haciendo es la la propia máquina virtual lo que va haciendo es decidir qué hilo virtual monta en el hilo de plataforma.
+Vale, ese mecanismo se llama el continuation y se se encarga de montar y
+desmontar hilos. [resoplido] Y la gran ventaja de de esto es que cuando un hilo virtual está montado en
+el hilo de plataforma y como está siendo gestionado por la máquina virtual, cuando la máquina virtual detecta que ese hilo se bloquea
+por una operación, un read, un bright, eh un slip, cualquier operación IO que
+sea tipo bloqueante, lo que hace la máquina virtual es desmontarlo. Es decir, no quiero tener los hilos de
+plataforma parados, me interesa tener los hilos de plataforma en en estado runing, runable, con
+ejecutando instrucciones, no esperando. Entonces, lo saco del hilo, lo desmonto del hilo de plataforma, meto el
+siguiente hilo virtual y con eso consigo un rendimiento muy alto.
+Voy a dar ya la palabra a mi compañero José, simplemente decir que aquí precisamente por esto que hemos contado,
+hay una aparte de las aparte de las ventajas, que después vamos a hablar más de ellas,
+que ya las podéis intuir sobre la memoria, ¿no? Tener en vez de tener 200 hilos, tener de plataforma solo tener 8
+10, eso tiene mucho impacto sobre el número de arenas que se abren y la expansión de memoria del proceso. la memoria del proceso es mucho, mucho
+mejor, pero esta es una ventaja muy importante. Eh, antes de tener dos hilos
+virtuales, [resoplido] ¿cómo conseguíamos que la concurrencia de nuestros procesos
+mejorase para evitar esas esperas, no? Cuando un proceso se bloquea porque está
+esperando un read o un bright. ¿Cómo lo cómo lo hacemos? Con programación reactiva. Es lo que hemos estado
+haciendo estos últimos años, ¿no? Future, compatibles, webflux.
+Ah, la programación reactiva eh es compleja.
+Hay que programar landas, eh hay que programar las funciones de callback, hay que orquestar el resultado de de los de
+los futurs. En en te tienes que escribir código, que ya no es código funcional,
+código de negocio, es código de orquestación para conseguir el resultado de todas esas tareas asíncronas y
+componer el resultado final. Es una programación compleja. Eh,
+yo prefiero escribir en secuencial a escribir en código reactivo. Gran
+ventaja de utilizar hilos virtuales es que el propio proyecto Lum se va a
+encargar de detectar esos estados de de bloqueo y yo puedo hacer mi código
+secuencial. [resoplido] No tengo que programar en reactivo. Esto es una gran ventaja.
+Y ahora eh mi compañero Jose os va a enseñar ya código.
+Sí, me ha tocado. Bueno, las fotos son Félix Rodríguez de la Fuente
+y yo antes de empezar con con la con la presentación
+mucho más joven es lo que tiene. Bueno, pues nada, haciendo un poquito de recap, ¿vale?
+eh lo que comentaba Raúl, ¿vale? Como esto es como vamos a terminar en toda la parte de virtual threads
+y es básicamente utilizando una pieza central que que se delega al final se delega en el en el motor Java que son
+los carriers y son los que hacen la multiplexión porlo de alguna manera, de esos hilos de plataformas hilos
+virtuales, ¿vale? Simplemente como recap. Bueno, pues
+esta es la típica frase que ponemos siempre y es lo que nos gusta ver en todo este tipo de de
+charlas, ¿no? Después de la magistral clase de sistema operativo. Raúl, [risas]
+perdón. Pues nada, [grito ahogado] ¿qué hemos montado? Os cuento un poco lo
+que hemos montado como como laboratorio, ¿no? Al final lo que hemos hecho es montar
+tres tres tipos de servidores distintos con tres tipos de clientes distintos.
+donde hemos colocado una un scrapping compromisus y donde vamos a enseñar, no vamos a hacer un live coding, no estamos
+tan locos todavía, ¿no? Y y básicamente eh vamos a ir enseñando resultados,
+¿vale? Con capturas de los trozos más importantes o más significativos.
+Básicamente aquí vamos a ir mucho adelante y atrás. Espero que no os perdáis un poco, pero bueno, este es el
+resumen que muchas ve muchas veces las presentaciones te presentan el como y al final el resultado, ¿no? Aquí lo hemos
+presentado al revés. Esto es realmente una comparativa de los tres tipos de programación que tenemos actualmente o o
+la evolución, por de alguna manera. Lo que contaba Raúl, los hilos de plataforma, ¿no? Equiparable o siendo un
+graper al final del hilo del sistema operativo. el reactivo, como ha dicho Raúl. Eh, bueno, pues básicamente es una
+evolución eh donde cambiaba el paradigma de programación y donde estábamos más
+gestionando el el OK, el onran, el etcétera, etcétera, con landas difícilmente debugueables
+y nada, un infierno, un infierno, un infierno y bueno, la evolución a Virtual 3, ¿no?,
+que que al fin y al cabo es una mezcla de los dos mundos, es decir, donde se ha delegado ese esa ejecución imperativa
+con todas las ventajas de la reactiva. Hemos preparado cuatro escenarios con todas las permutaciones. Programación
+reactiva con hilo plataforma, programación reactiva con hilo virtual, programación secuencial con plataforma,
+programación secuencial con hilo virtual. Bueno, realmente tres, porque la programación reactiva con el virtual
+no tiene sentido. Eh, su objetivo es el mismo, no tiene sentido de las dos. Entonces, nos quedamos con tres
+al final. Bueno, vamos a ir vamos a ir adelante y atrás, ¿vale? Bueno, [carraspeo]
+la parte más importante, aunque aunque eh están por ahí ocultas las diapositivas, pero la parte que más
+importa son la parte servidora, ¿no? Al cliente al final también lo podríamos utilizando paquetería Java, también
+podríamos utilizar la programación imperativa y reactiva en cliente, pero la que nos interesa realmente son los
+servidores, ¿vale? Bueno, yo creo que la parte de eh la primera lo al final lo
+que tenemos es un un método en un servidor, ¿no? Con un
+slip. Yo creo que todo el mundo no hay mucho que que no entendamos, ¿no? Al final hay un strep slip bloqueante,
+¿no? Eso es lo que hemos utilizado en el servidor. Es decir, el arriba es el escenario de
+programación ah secuencial tradicional montada sobre hilo de plataforma. Estaba
+intentando poner el rojito, pero no no sale. Bueno, ese es el primero. Bueno, pasamos a la parte reactiva. Al final
+tenemos, es decir, primera primera captura, un controller y empiezan a aparecer eh ahí unos palabros que son
+mono. Al final ya no estamos devolviendo una respuesta pura, sino estamos utilizando eh paquetería reactiva, donde
+utilizamos eso. acordarse al final lo que tenemos es eh
+un event loop, que es lo que hace la programación reactiva realmente y lo que hace es bucle y ciclando
+el estado el estado de la pila de de stacks que van controlando los estados
+de los hilos y cuando están de vuelta porque aquí ención reactiva acordarse que tenemos los callback.
+[resoplido] Entonces cuando me llega el colbar, vuelve a la pila y como está OK, vuelvo a iterarlo, es decir, hago un una
+gestión de de estados de hilo. Y esta pranciación rectiva es muy sencilla porque solo hay una landa, no
+tengo que gestionar cuatro o cinco su resultado, pero bueno, os os podéis hacer una una idea, eso es,
+¿vale? Pues todo esto lo aumentamos sobre una ejecución de hilo plataforma, no virtual y vemos los resultados.
+Eso es primer parte de controler y el segundo eh un método un servicio que vuelven a aparecer lo que tenemos ahí es
+un mono delay. que no puedo utilizar. Aquí no podremos pensar, ¿y por qué no utilizado el strep slip?
+el strep eh slip porque allí era bloqueante y no me interesa que se bloquee, no me interesa mandarlo al al
+estado bloqueado. Entonces aquí tenemos el mono delay, pero al final volvemos a lo mismo. La respuesta es, me espero 2
+segundos, lo devuelvo, que el que aquí me controle el la parte reactiva, la paquetería
+reactiva me controle los estados y cuando llegue el callback lo devuelvo. Vale,
+con esto conseguimos, bueno, esto conseguimos toda esa parte de disparar,
+esa concurrencia que más que hilos, lo que hemos disparado es la concurrencia, ¿vale? Perdona. Y este es el código del último
+escenario. Eso es que, es decir, programación secuencial sobre
+hilo virtual, que es ex el mismo código que programación secuencial con plataforma. Volvemos a la programación
+secuencial. Fijaros en eh eh de hecho de hecho eh compartimos el el
+repositorio de de DJ por si quieren verlo, pero que es un copy paste, un copy and paste del servidor,
+¿vale? Bloqueante. Y vemos resultados. Y aquí empieza la diversión, por lo menos es la parte que a todos nos
+gustaría ver, ¿no? La parte izquierda, eh, 6000 peticiones
+con 200 hilos, que por defecto es el valor por defecto utilizado, en este
+caso es Printboot, ¿vale? Que tenemos 200 hilos de plataforma en Cat.
+Ahí lo veis, ha tardado pues 60 segundos, eh, utilizando aproximadamente 200
+hilos. Si veis la grafiquita o ahí se ve el que la mayoría de los hilos están
+esperando, ¿vale? Vamos porque claro, como es un slip está esperando. Son dos todos en estado
+weight, es decir, esto no está ejecutando instrucción, está todo en estado weight. Esto es lo que pasa con los con los
+hilos de plataforma cuando no tengo cuando no cuido la programación, eh no hago programación reactiva,
+yo hago petición, el servidor se para 2 segundos casi y las respuestas son entre 1 y 3 milisegundos, es decir, se lleva
+pues el 99,99% de las veces está esperando, se queda
+bloqueado. Y la línea verde, que la letra es muy pequeña, disculpad. La línea verde son
+los hilos que están eh runable ejecutando. Como veis es una diferencia abismal, ¿no? De tíos esperando y los
+están siempre esperando. Es decir, eso es estamos desaprovechando toda la potencia. Básicamente el resto de
+gráficas pues ya lo veis, ¿no? Es decir, el throwbot pues 99 peticiones por segundo, el uso del hip que obviamente
+tiene variaciones porque estamos manejando la memoria y eh el uso del hip
+no hip que podríamos hacer un pequeño truque que falta falta un trozo de memoria que no hemos contado. Sí, todo
+esto de las arenas y demás, no, por desgracia no hay ninguna métrica Promicius o sistema de monitoreo o JJ
+JMX que me lo diga porque es eso es es alojación directa de sistema operativo.
+Necesito herramientas Linux para medirla, no herramientas Java. Todo es el problema de las arenas es complejo de
+manejar. Vale, recordemos esas 100 peticiones por segundo. Vale, vamos a la siguiente. Venga.
+Entonces, ahora es esta es la ejecución a eh la ejecución reactiva sobre los del plataforma. Fijamos ahora la línea verde
+y la línea amarilla cómo han cambiado. Ya tenemos tenemos la verde por encima de, o sea, tenemos running por encima de
+las esperas, ¿vale? Esto está disparando eh exponencialmente el
+rendimiento y el número de peticiones que pueda tener con los mismos hilos. Mirar el tiempo, tardamos la mitad
+a cambio del cambio de paradismo de programación y cambio de paquetería. Eso sí lo tenemos el precio de tener que
+programación secuencial e programación reactiva que seguro que alguien dice, "Bueno, ¿y si cogemos el código legacy que tengo en
+Java?" Vamos a preguntar a quién le gusta la programación reactiva. Y ahora levanto todo el mundo la mano y nos vamos. Nadie. [risas]
+Eso es. Vale, pues eso, básicamente tardamos la mitad. Tiene mucha, es verdad que tiene muchas virtudes.
+Son todos de backend. Pues sí, [risas] básicamente, pero básicamente pues
+tardamos la mitad, subimos, subimos el número de peticiones por segundo, vemos cambios en la gráficas sustancial,
+¿vale? Y y esto ya es virtual thread
+programación secuencial, el mismo slip de antes, pero sobre hilo virtual.
+de nuevo el verde por encima del amarillo con la misma programación
+secuencial y ponía activando eh eh la característica de los virtuales, en este caso para Tomcat, ya
+tenemos esta ganancia, estamos multiplicando el rendimiento del proceso. El cambio son principalmente
+dos líneas, es decir, hm no quiero decir esto porque son alarmista porque es verdad que efectivamente después cuando
+quieres afinar no son dos líneas, pero el activar los virtual thread en un springbot son activas los virtual 3 en
+una en un application y jamel en una application y jamel y cambias una clase
+que le dices que es el lugar que son de fix thread pools a virtual pool.
+Correcto. Es un un solo cambio, [carraspeo] fijaros. Es decir, mitad de tiempo vemos
+la gráfica del de las peticiones por segundo cambia la lo que dice Raúl, el
+número de de en ejecución está por encima de los que están esperando por
+tiempo, que este caso tenemos los son time waiting porque tenemos un delay de 2 segundos por ahí se quedan 2 segundos
+ahí y obviamente cambia eh afecta al hip. Vale,
+estos son las principales métricas que tomamos nosotros cuando hicimos la nuestra demo, ¿vale? Son métricas útiles
+para recolectar en tableros, eh, y ver el estado de de misilos, ¿no? Para
+ver si está esto es que es un caso real, es decir, que no que no que hicimos este tipo de mediciones, ¿vale? Tomamos muchas más
+métricas y al final donde notamos que más cambios había era precisamente en estas, ¿vale? Entonces, bueno, pues si
+os dais cuenta, eh, pues los 200 interesantes, los ocho hilos principales
+en el que dependen de la CPU visible, ¿vale? Y la virtual pues se dispara a
+miles, es decir, que aquí estamos hablando de que comparar 1 mega de platform de hilos de plataforma contra
+importante casi los 1000 equivalentes, porque como el stack lo maneja la propia máquina virtual, lo aloja en el hip
+Java. si es mucho más pequeño, mucho más reducido que el que el stack en hilo de
+plataforma que puede llegar hasta 1 me Entonces por eso el hip nos puede aumentar también, eso hay que decirlo.
+Vamos a reducir arenas por tener muchos menos hilos de plataforma. Vamos a reducir el el el todo la zona de stacks
+del proceso porque tenemos menos hilos del plataforma, pero el hip interno de de Java aumentará e porque claro, voy a
+crear si quiero millones de objetos. Los objetos Java
+ocupan, no son gratis tampoco, ocupan memoria. interesante, pero son mucho más ligeritos que lo
+es el peso que ocupa de 1 me a 1k 1 2K porque pueden aumentar, podemos meter
+datos en ese virtual que puede llegar a 2K, ¿correcto? Pero no se reserva de mega en mega, sino de K en K, lo cual es una superventaja.
+Y la otra es la ubicación. La ubicación es uno lo controlaba el sistema operativo y este lo genera el hip que
+aparece nuestro magnífico gerbage collector y hace limpieza. ¿Correcto? Lo cual esa memoria la acabas
+de reducir en la primera pasada del algoritmo. Eso es. [risas] Lo importante es tener un buen algoritmo
+de Carvacho Collector, no un serial ni un paralel, un G1 como mínimo para gestionar porque son muchos millones de
+objetos eh en ejecución. Un buen Cabas Collector habilidad.
+Vamos haciendo un resumen, ¿no? Pues escalabilidad de 200 hilos a miles o millones, porque ahí podríamos, ya te
+digo, la memoria mucho más eficiente por el tamaño. En cuando utilizamos virtual
+thread no definimos ese pull size, cosa que se utiliza con los de plataforma.
+La CPU, bueno, pues al ser entrada operaciones de entrada salida, hombre. Hm. Bueno, creo que la tenemos después
+de no es eficiente en operaciones de tal, lo hablamos y el código es simple porque no cambia.
+Tenemos un código imperativo y código yo personalmente lo agradezco un montón.
+Y nada, última último sprint. [resoplido]
+Las ventajas de los visual 3 ya las ya las hemos visto, ¿vale? Pero
+hay ocasiones en los que no todo es tan maravilloso, ¿vale? Hay dos problemas que se llaman la la monopolización y el
+pinning que están asociados a a los hilos virtuales. ¿Qué es la monopolización?
+A ver, imaginaos que tenéis solo cuatro hilos de plataforma, ¿vale?
+[resoplido] y se monta en un plataforma un virtual thread que va a tener una ejecución muy larga, un proceso de cálculo eh muy
+importante, ya no operaciones entrada salida, sino una operación de cálculo en la que va a estar mucho tiempo. ¿Qué
+pasa? Pues que yo tengo una capacidad de ejecución de cuatro hilos de plataforma.
+creo 200 virtuales, pero solo cuatro de ellos van a estar realmente en ejecución al mismo tiempo. Solo en cada uno de
+ellos, cada plataforma solo se va a montar un hilo virtual. Si esos están ahí mucho tiempo, ¿qué pasa? Que tengo
+una cola de espera de trabajo muy importante que no voy a despachar solo
+con cuatro hilos. Lo acabas de convertir en un hilo bloqueante. Eso es. Entonces, eso se llama monopolización, que es cuando un virtual
+thread hace una tarea dentro de su carrier, de subirlo de plataforma que
+tarda demasiado tiempo. Estoy desperdiciando eh toda la ventaja de, es
+decir, ¿cuándo tengo que utilizar los plos virtuales? Operaciones muy cortas y
+preferentemente de entrada a salida. Si estoy haciendo procesos initativos de cálculo, mejor utilizar hilos de
+plataforma tradicional y tener un pull de 200 y que despachen, ¿vale? Pues si tengo poquitos y los me apodero de ellos
+solo con cuatro, tengo un problema. Y el otro gran problema es el el
+pinning. [resoplido] Fijaos en este trozo de código. De
+nuevo, aquí tenemos un slip para forzar una operación que es bloqueante, ¿vale? igual que el código como visto antes,
+pero por encima de él hay un bloque sincronize. ¿Vale?
+¿Qué pasa aquí? Al estar ese bloque, eh, al estar el
+slip, que es el slip, es donde nosotros esperamos que la máquina virtual diga slip, bloqueo, quito el virtual trad y
+meto otro. Vale, pero al estar eso dentro de un bloque sincronizado,
+la máquina virtual [resoplido] no puede eh desmontar el
+frame stack de este hilo porque está físicamente grabado en el hilo de
+plataforma. Es una una limitación, era una limitación de la máquina virtual Java. ¿Qué quiere decir esto?
+que esto no este virtual 3D no se va a desmontar de su carrier,
+pero se va a bloquear cuando llegga el slip se va a bloquear. Consecuencia, voy a tener al hilo de plataforma bloqueado.
+Es lo último que quiero. Peor aún que la monipolización solo tengo cuatro hilos
+de plataforma y si se me bloquean cero capacidad de ejecución en ese momento.
+No te has quedado sin ninguna potencia. Grandísimo problema el pinning, ¿vale?
+Eh, durante estos últimos años eh Virtual Threads eh eh empezó en Java 19, en
+oficial, en 21 ya la versión oficial, pues de la 21 a 24 para evitar estos
+problemas de pinning reportados masivamente por todas las librerías que os imaginéis, Spring, Strut, Apache,
+Cafka, todas, Jeti, Neti, eh han estado reescribiendo su código. código para
+eliminar bloques sincronizados y utilizando el API, el nuevo API de sincronismo, los locs y los rentras lo
+logs, el API Java de sincronización y evitar utilizar las keywords syncroniz
+en en bloques o en métodos sincronizados. Y ha habido mucho trabajo muy intenso
+para eliminar eso. Afortunadamente a partir de Java 24 y con este Javaement,
+el 491, se ha resuelto este problema, se ha cambiado el el modelo de gestión de los
+monitores sobre objetos. Mm h no solo para solucionar el problema
+del del pinning, sino como una mejora general de la máquina virtual. La tenemos a partir de la 24. Esto es muy
+importante porque vais decir, "Bu mañana llego al trabajo y me voy a poner a trabajar con
+los virtuales." Aseguraos de tener como mínimo Java 24, ¿vale? Porque si no, la probabilidad de
+incurrir en problemas de pinning por las dependencias transitivas que tengáis de librerías de terceros que no sabéis lo
+que tienen dentro, no sabéis si están limpias el bloque sincroniz alta, ha muchos problemas de de pinning
+y detectarlo no es fácil. Detectarlo nada. [risas] Detectarlo es nada fácil porque de
+repente tienes que hacer dumps y ver que todos misilos están bloqueados versus
+stacks es complejo. ¿Vale? Entonces a partir de Java24 lo tiene resuelto. Como
+sabéis, las versiones pares en Java no se usan, así que la 25, ¿vale?
+Creo que la última par que fue LTS fue la ocho, ¿no? Luego ya todas sin pares.
+Entonces, pongamos Java 25, ¿vale? Para digo como una medida de seguridad para poder utilizar hilos virtuales sin
+problema. Esa es. Eh, el pinning no solo ocurre con bloques
+sincronizados, hay otro caso de uso que es cuando llamas por JN JNI a un native
+interface a un método externo, ¿vale? O sea, si estás llamando una subrutina C,
+ese código C si si se hace un bloqueo ahí dentro en Rit, claro, eso Java ya no lo detecta, eso es código C, código
+máquina para él, eso no lo detecta. Entonces, en librerías que dependan,
+drivers de bases de datos, eso que dependen de de de librerías C, también
+está la de operativo, algunos drivers antiguos, cosas de estas, puede haber problemas de pinning también aunque no
+esté el código. Venga,
+tabla resumen. No lo toméis como como ley, ¿vale? pero
+más o menos de las versiones de frameworks y librerías a partir de las
+cuales digamos que están eh libres de pinning,
+¿vale? Que han hecho el esfuerzo para poder utilizarlas, ¿vale? Hemos puesto aquí algunos eh frameworks de de
+desarrollo. Eh, Springbook cuarto, bases de datos.
+Kafka e con Kafka mi recomendación,
+probadlo, ¿vale? activad virtual sets, metedle carga y probad, porque [resoplido]
+Kafka no ha reportado nunca una versión que diga, pues yo soy compatible con con LoM o no. Vale, de hecho hace cosas
+extrañas, por ejemplo, el producer de Cafca para enviar un mensaje, aunque tú actives en tu en tu thread de puls de tu
+aplicación y los virtuales, él se sigue creando su propio de plataforma tradicional para operar al margen y yo
+envío mi mensaje con una plataforma. Los Visual 3 van por su lado y los consumers
+pues hay notas escondidas y recomendaciones en la documentación de Kafka y en la de Spring para acotar y
+limitar el número de consumidores o recurrentes para que no superen el número de hilos de plataforma que yo
+tengo. Y ya podéis sentir que eso va relacionado con potenciales riesgos de
+pinning que pueda tener los consumidores KFCA. [grito ahogado] Pero [tos] como nota, como nota difícil
+de detectar, cuidado con el la longitud del evento que no sea especialmente largo y bloqueante. Si por eso no por
+eso son muy difíciles detectar que si los eventos son muy cortitos empiezan a es difícil que te desbloqueen
+ciertas operaciones, pero si empezáis a lanzar eventos mega largos empiezan los
+los problemas y repito, difícil de detectar, ¿eh? Entonces, mirad bien vuestras versiones, la versión de la
+máquina virtual, vedación de vuestras dependencias, si
+reportan que están eh libres de pinning o no y probad mucho, ¿vale? Estamos en
+un estado en el que ah digamos dentro del mundo Java en el que no podemos
+asegurar en ningún caso. Yo mañana activo virtual threads y todo me va a funcionar perfecto con las ventajas que
+hemos visto antes y aumento el rendimiento. Puede haber inconvenientes, ¿vale? Entonces la ventaja potencial es
+mucha, hay que tener cuidado y hay que probar, ¿vale?
+Y ahí empieza y hay algo equivalente fuera del mundo Java.
+similar a los hilos virtuales, Python,
+eh, o DS, otros lenguajes de de BAC,
+¿no? En los demás, programación reactiva, GO
+Colan es quizá el único el único programa que tiene eh el único lenguaje de programación, plataforma que tiene
+algo parecido alum para la autodetección de bloqueos y dejarlos. tiene algo
+parecchido go es el único. El resto
+programación reactiva para para evitar bloqueos para decir lógica de coordinación, future compatibles a
+etcétera. ¿Vale? Eh, es decir, Javaaki tiene un, o
+sea, este proyecto Lum es super importante, eh, puede ser una de las características más importantes, quizá
+desde el cambio de de los últimos años de jabanío, eh, el más importante quizás
+es este proyecto L y más esperado y más esperado. todavía no tiene una adopción masiva, pues por eso, porque
+hay muchas librerías que tienen que ir adaptándose y y demás, pero pero es un
+proyecto muy importante. [grito ahogado] Eh, empezamos ruegos y preguntas que
+estamos ya fuera de tiempo. Mientras os dejamos aquí el el QR del feedback, por favor, eh, para
+que nos pongáis verdes ahí, ¿vale? Eh, y preguntas, dudas y muchas gracias a
+todos. [aplausos] ¿Por qué ocupa un virtual thread 1 KB, 2
+KB y los ths de sistema 1 MB? No, no tienen la misma información. ¿Por qué
+esa diferencia? Venga, dale. Buena pregunta. Eh,
+la hemos medio resuelto por el camino. Sí. [resoplido] Eh, no tienen exactamente la misma
+información. Porque como hemos dicho, un hilo eh
+virtual comparte memoria y recursos con el proceso padre.
+Entonces, muchos de los recursos que necesita el stack de de ese hilo los
+tiene directamente eh en el proceso padre, no tengo que copiarlos en en el stack. Eh,
+objetos, variables, punteros, variables locales. Esto permite reducir mucho el el tamaño de ese stack. De todas formas,
+también hay que decir que el en el hilo de plataforma [resoplido] ese tamaño de un mega es
+para e cubrirse las espaldas, ¿vale? Ese tamaño de 1 mega quiere decir que puedo llegar
+hasta 1 mega. Es memoria virtual, no memoria comiteada. Un habitualmente no
+se llega a consumir ese ese mega. Yo creo que de media estará entre 100 K, 200 C por ahí más o menos.
+eh que se asemeja más a lo que ocupa el hilo virtual. Lo que pasa es que plataforma tiene que estar preparado
+para cualquier tipo de carga de trabajo, para un stack muy grande que venga o para un stack muy pequeñito. Pero
+nosotros en los virtuales lo que queremos es que sus stacks sean pequeñitos, pero pueden ser muy grandes.
+Si yo le meto a ejecutar un algoritmo de inteligencia artificial, un star, una
+búsqueda de Snakebard, cosas de estas, su stack va a ser enorme y ocupará más.
+Lo que pasa que lo que queremos, el tipo de evaluación que queremos ahí es programación secuencial, cortita, está
+corto una operación de entrada, salida de bloqueante y terminar. Yo, por ejemplo, hubiera dicho, es decir, como
+al final es un grapper del hilo del sistema operativo que sí ocupa un mega, porque son los hilos antiguos del
+sistema operativo, ¿sí? y no la nueva reedición de hilo, que diríamos que es la virtual, al final
+por eso ocupa el mega, es decir, al final tiene información similar, sí, pero que podría llegar, o sea, si
+programo mal, ¿no? [risas] Una programación recursiva muy grande, puedo aumentar mucho el el stack del
+hilo virtual. Eh, perfecto, muchas gracias. Otra otra pregunta, ¿tiene sentido usar
+programación reactiva o paquetería reactiva con
+virtual threads? Y entonces e
+[resoplido] entonces, ¿qué es mejor? Programación reactiva o virtual threads? Eh, para gustos colores, como se decía
+en mi pueblo, ¿no? Yo eh mi opinión personal, si voy a tener
+el mismo el mismo al final el el objetivo deción reactivales es no tener
+hilos bloqueados. Si consigo el mismo objetivo con los dos
+y me cuesta menos programar en secuencial que programar en reactivo, porque en reactivo tengo que tener
+lógica programada de orquestación de del resultado de las landas y de los de los futures, yo prefiero programar en en
+secuencial, pero habrá gente que le guste mucho el reactivo.
+De hecho, de hecho es contraproducente porque estaríamos jugando, estamos jugando con un reproducar los dos, no
+mezclar los dos. Eso es uno u otro. Yo diría Virtual 3. Yo es decir, aquí
+coincidimos más la imperativa, obviamente, pero tener servidores reactivos mezclado con virtual threads.
+Tú dices, el rendimiento no vas a ganar nada, ¿no? El desarrollo es mucho peor, mucho peor de bugging y encima posiblemente Neti se
+pelee con la parte de virtual thread. Claro. [risas] Entonces estás haciendo un estás matando
+a las virtudes de posiblemente de las dos. Sí. Tengas algún algo en contra. Es un
+escenario que nos hemos traído programado porque no le vemos sentido. No tiene mucho sentido. [música]
