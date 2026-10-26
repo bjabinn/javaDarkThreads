@@ -6,7 +6,7 @@
 
 Este documento establece el software que debe instalar cada asistente para trabajar en el garage del proyecto **javaDarkThreads** (comparativa Platform Threads vs Reactive vs Virtual Threads, repositorio de ViewNext). El entorno estándar es **VS Code conectado a WSL2, con Podman como motor de contenedores**.
 
-Quedan fuera del alcance **Kafka y PostgreSQL**: no se instalan, no se construyen y no se arrancan. Docker Desktop no es necesario ni debe instalarse. Nosotros lo hemos implementado con este software: 
+Nosotros lo hemos implementado con este software: 
 
 | Campo | Valor |
 | --- | --- |
@@ -47,9 +47,7 @@ Extensiones de VS Code (se instalan **en WSL**, no en Windows):
 - Container Tools (`ms-azuretools.vscode-containers`), configurada con Podman como cliente
 - YAML (`redhat.vscode-yaml`), útil para `prometheus.yml` y los dashboards de Grafana
 
-**No instalar:** Docker Desktop, Maven (se usa `./mvnw`), Kafka, PostgreSQL ni clientes de base de datos.
-
-**Recursos mínimos del equipo:** 16 GB de RAM (6 apps Java + 2 contenedores), 10 GB libres en disco y virtualización activada en BIOS.
+**No instalar:** Docker Desktop, Maven (se usa `./mvnw`). 
 
 ## 4. Procedimiento de instalación
 
@@ -91,10 +89,9 @@ La última orden debe mostrar `FedoraLinux-44` con `VERSION 2`. Al primer arranq
 sudo dnf install -y git curl dos2unix java-25-openjdk-devel podman
 ```
 
-**Paso 4 – Clonar el repositorio dentro de WSL.** El código debe vivir en el sistema de ficheros de Linux (`~/dev`), **no** en `/mnt/c` ni en OneDrive: Maven y los contenedores son mucho más lentos en rutas de Windows y OneDrive sincroniza `target/`.
+**Paso 4 – Clonar el repositorio dentro de WSL.** 
 
 ```bash
-mkdir -p ~/dev && cd ~/dev
 git clone <URL-del-repositorio> javaDarkThreads
 cd javaDarkThreads
 git config core.autocrlf input
@@ -106,8 +103,6 @@ git config core.autocrlf input
 find . -name "*.sh" -exec dos2unix {} +
 chmod +x scripts/*.sh */run.sh */mvnw
 ```
-
-> Esta conversión aparecerá como cambio en Git. No se debe incluir en commits salvo que el equipo decida normalizar el repositorio (añadiendo un `.gitattributes` con `*.sh text eol=lf`).
 
 ## 5. Configuración de VS Code con WSL2 y Podman
 
@@ -130,15 +125,9 @@ chmod +x scripts/*.sh */run.sh */mvnw
 systemctl --user enable --now podman.socket
 ```
 
-5. **(Opcional, recomendado)** Limitar la memoria de WSL2 creando `%UserProfile%\.wslconfig` en Windows y ejecutando después `wsl --shutdown`:
+5. **Ajuste necesario en Prometheus.**
 
-```ini
-[wsl2]
-memory=8GB
-processors=4
-```
-
-**Ajuste necesario en Prometheus.** Prometheus, dentro de su contenedor, consulta las apps Java mediante `host.docker.internal` (fichero `prometheus/prometheus.yml`). Con Podman rootless ese nombre puede no resolverse. Si en `http://localhost:9090/targets` aparecen los jobs en estado DOWN, se debe añadir `--add-host=host.docker.internal:host-gateway` al `podman run` de `scripts/12-run-prometheus.sh`, o sustituir `host.docker.internal` por `host.containers.internal` en `prometheus.yml` y reconstruir la imagen. Este cambio debe acordarse e incorporarse al repositorio una sola vez por el equipo organizador, no por cada asistente.
+Prometheus, dentro de su contenedor, consulta las apps Java mediante `host.docker.internal` (fichero `prometheus/prometheus.yml`). Con Podman rootless ese nombre puede no resolverse. Si en `http://localhost:9090/targets` aparecen los jobs en estado DOWN, se debe añadir `--add-host=host.docker.internal:host-gateway` al `podman run` de `scripts/12-run-prometheus.sh`, o sustituir `host.docker.internal` por `host.containers.internal` en `prometheus.yml` y reconstruir la imagen. Este cambio debe acordarse e incorporarse al repositorio una sola vez por el equipo organizador, no por cada asistente.
 
 ## 6. Verificación y arranque del proyecto
 
