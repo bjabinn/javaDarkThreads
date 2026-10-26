@@ -5,16 +5,16 @@
 echo "📈 Iniciando contenedor de Grafana..."
 
 # Verificar si el contenedor ya existe
-if docker ps -a --format '{{.Names}}' | grep -q '^grafana$'; then
+if podman ps -a --format '{{.Names}}' | grep -q '^grafana$'; then
     echo "⚠️  El contenedor 'grafana' ya existe. Eliminándolo..."
-    docker rm -f grafana
+    podman rm -f grafana
 fi
 
 # Crear volumen si no existe
-docker volume create grafana-data 2>/dev/null || true
+podman volume create grafana-data 2>/dev/null || true
 
 # Ejecutar contenedor con volumen persistente
-docker run -d \
+podman run -d \
     --name grafana \
     --network app-network \
     -p 3000:3000 \

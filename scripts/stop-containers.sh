@@ -19,14 +19,14 @@ echo "================================================"
 echo ""
 
 echo "Parando contenedores..."
-docker stop $TARGETS 2>/dev/null
-docker rm $TARGETS 2>/dev/null
+podman stop $TARGETS 2>/dev/null
+podman rm $TARGETS 2>/dev/null
 
 echo ""
 echo "✅ Contenedores parados y eliminados: $TARGETS"
 echo ""
 echo "Para eliminar también las imágenes:"
-echo "  docker rmi poc-prometheus poc-grafana"
+echo "  podman rmi poc-prometheus poc-grafana"
 echo ""
 echo "Para eliminar también la red:"
-echo "  docker network rm app-network"
+echo "  podman network rm app-network"

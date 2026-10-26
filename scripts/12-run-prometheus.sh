@@ -5,13 +5,13 @@
 echo "📊 Iniciando contenedor de Prometheus..."
 
 # Verificar si el contenedor ya existe
-if docker ps -a --format '{{.Names}}' | grep -q '^prometheus$'; then
+if podman ps -a --format '{{.Names}}' | grep -q '^prometheus$'; then
     echo "⚠️  El contenedor 'prometheus' ya existe. Eliminándolo..."
-    docker rm -f prometheus
+    podman rm -f prometheus
 fi
 
 # Ejecutar contenedor
-docker run -d \
+podman run -d \
     --name prometheus \
     --network app-network \
     -p 9090:9090 \

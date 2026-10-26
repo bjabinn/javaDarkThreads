@@ -25,20 +25,19 @@ El repositorio contiene seis aplicaciones Spring Boot (un servidor y un cliente 
 | Prometheus | Contenedor, scraping cada 1 s | 9090 |
 | Grafana | Contenedor, 3 dashboards preconfigurados | 3000 |
 
-Todas las aplicaciones compilan con **Java 21** y Maven Wrapper (`mvnw`), de modo que no hace falta instalar Maven. 
+Todas las aplicaciones declaran **Java 21** como versión objetivo (se compilan y ejecutan con el JDK 25 instalado) y Maven Wrapper (`mvnw`), de modo que no hace falta instalar Maven. 
 
 ## 3. Software requerido
 
-Cada asistente necesita siete elementos. Los de la primera parte se instalan en Windows; los de la segunda, dentro de Fedora (WSL2).
+Cada asistente necesita seis elementos. Los de la primera parte se instalan en Windows; los de la segunda, dentro de Fedora (WSL2).
 
 | Ámbito | Software | Versión | Finalidad |
 | --- | --- | --- | --- |
 | Windows | WSL2 + Fedora Linux | 44 | Entorno Linux donde se ejecuta todo |
 | Windows | Visual Studio Code | ≥ 1.90 | Editor |
 | Windows | Extensión WSL (`ms-vscode-remote.remote-wsl`) | última | Apunta VS Code a WSL2 |
-| WSL (Fedora) | OpenJDK | **21** | Compilar y ejecutar las apps |
+| WSL (Fedora) | OpenJDK | **25** (el código declara Java 21 y compila con un JDK superior) | Compilar y ejecutar las apps |
 | WSL (Fedora) | Podman | ≥ 5.0 (incluido en Fedora 44) | Motor de contenedores sin demonio |
-| WSL (Fedora) | `podman-docker` | — | Alias `docker` → `podman`, necesario para los scripts del repo |
 | WSL (Fedora) | Git, curl, `dos2unix` | últimas | Clonado, pruebas y conversión de saltos de línea |
 
 Extensiones de VS Code (se instalan **en WSL**, no en Windows):
@@ -89,16 +88,10 @@ La última orden debe mostrar `FedoraLinux-44` con `VERSION 2`. Al primer arranq
 **Paso 3 – Paquetes base, JDK 25 y Podman (terminal de Fedora).**
 
 ```bash
-sudo dnf install -y git curl dos2unix java-25-openjdk-devel podman podman-docker
+sudo dnf install -y git curl dos2unix java-25-openjdk-devel podman
 ```
 
-**Paso 4 – Alias `docker` sin avisos.** `podman-docker` crea el comando `docker` que usan los scripts del repo; esta orden suprime el mensaje de emulación.
-
-```bash
-sudo touch /etc/containers/nodocker
-```
-
-**Paso 5 – Clonar el repositorio dentro de WSL.** El código debe vivir en el sistema de ficheros de Linux (`~/dev`), **no** en `/mnt/c` ni en OneDrive: Maven y los contenedores son mucho más lentos en rutas de Windows y OneDrive sincroniza `target/`.
+**Paso 4 – Clonar el repositorio dentro de WSL.** El código debe vivir en el sistema de ficheros de Linux (`~/dev`), **no** en `/mnt/c` ni en OneDrive: Maven y los contenedores son mucho más lentos en rutas de Windows y OneDrive sincroniza `target/`.
 
 ```bash
 mkdir -p ~/dev && cd ~/dev
@@ -107,7 +100,7 @@ cd javaDarkThreads
 git config core.autocrlf input
 ```
 
-**Paso 6 – Normalizar saltos de línea.** Los `.sh` del repositorio están guardados con CRLF (formato Windows) y fallan en Linux con `bad interpreter`. Se convierten una vez:
+**Paso 5 – Normalizar saltos de línea.** Los `.sh` del repositorio están guardados con CRLF (formato Windows) y fallan en Linux con `bad interpreter`. Se convierten una vez:
 
 ```bash
 find . -name "*.sh" -exec dos2unix {} +
@@ -126,7 +119,7 @@ chmod +x scripts/*.sh */run.sh */mvnw
 {
   "containers.containerClient": "com.microsoft.visualstudio.containers.podman",
   "java.configuration.runtimes": [
-    { "name": "JavaSE-21", "path": "/usr/lib/jvm/java-21-openjdk", "default": true }
+    { "name": "JavaSE-25", "path": "/usr/lib/jvm/java-25-openjdk", "default": true }
   ]
 }
 ```
@@ -152,9 +145,8 @@ processors=4
 Comprobación del entorno, desde la terminal de Fedora:
 
 ```bash
-java -version          # debe indicar 21.x
+java -version          # debe indicar 25.x
 podman --version       # >= 5.0
-docker --version       # responde mediante podman-docker
 podman run --rm hello-world
 ```
 
@@ -188,11 +180,10 @@ Para parar la infraestructura: `./scripts/stop-containers.sh`.
 
 | Síntoma | Causa | Solución |
 | --- | --- | --- |
-| `bad interpreter: /bin/bash^M` al ejecutar un `.sh` | Saltos de línea CRLF | `dos2unix` (sección 4, paso 6) |
-| `Permission denied` al lanzar `./run.sh` o `./mvnw` | Falta bit de ejecución | `chmod +x` (sección 4, paso 6) |
+| `bad interpreter: /bin/bash^M` al ejecutar un `.sh` | Saltos de línea CRLF | `dos2unix` (sección 4, paso 5) |
+| `Permission denied` al lanzar `./run.sh` o `./mvnw` | Falta bit de ejecución | `chmod +x` (sección 4, paso 5) |
 | Maven muy lento o ficheros bloqueados | Repositorio en `/mnt/c` u OneDrive | Clonar en `~/dev` dentro de WSL |
 | Jobs DOWN en Prometheus | `host.docker.internal` no resuelve en Podman | Ajuste de la sección 5 |
-| `docker: command not found` | Falta `podman-docker` | `sudo dnf install podman-docker` |
 | Container Tools no lista contenedores | Socket de Podman inactivo | `systemctl --user enable --now podman.socket` |
 | `systemctl --user` falla | systemd desactivado en la distro | Añadir `[boot]` con `systemd=true` en `/etc/wsl.conf` y ejecutar `wsl --shutdown` |
 | Puerto en uso (8080, 9090, 3000…) | Otro proceso local | `ss -ltnp \| grep <puerto>` y detenerlo |

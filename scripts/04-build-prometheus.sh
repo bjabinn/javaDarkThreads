@@ -8,7 +8,7 @@ PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 echo "📊 Construyendo imagen de Prometheus..."
 
-docker build -t poc-prometheus:latest "$PROJECT_DIR/prometheus"
+podman build -t poc-prometheus:latest "$PROJECT_DIR/prometheus"
 
 if [ $? -eq 0 ]; then
     echo "✅ Imagen poc-prometheus construida exitosamente"

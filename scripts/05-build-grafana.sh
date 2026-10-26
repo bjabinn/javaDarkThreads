@@ -8,7 +8,7 @@ PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 echo "📈 Construyendo imagen de Grafana..."
 
-docker build -t poc-grafana:latest "$PROJECT_DIR/grafana"
+podman build -t poc-grafana:latest "$PROJECT_DIR/grafana"
 
 if [ $? -eq 0 ]; then
     echo "✅ Imagen poc-grafana construida exitosamente"

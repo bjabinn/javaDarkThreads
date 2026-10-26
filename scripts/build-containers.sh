@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# Script maestro para construir todas las imágenes Docker
+# Script maestro para construir todas las imágenes Podman
 
 # Obtener el directorio donde está este script
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-echo "🚀 Construyendo todas las imágenes Docker..."
+echo "🚀 Construyendo todas las imágenes Podman..."
 echo "================================================"
 echo ""
 

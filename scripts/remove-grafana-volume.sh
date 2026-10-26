@@ -13,14 +13,14 @@ if [[ "$confirm" != "s" && "$confirm" != "S" ]]; then
 fi
 
 # El volumen no se puede eliminar si el contenedor lo está usando
-if docker ps --format '{{.Names}}' | grep -q '^grafana$'; then
+if podman ps --format '{{.Names}}' | grep -q '^grafana$'; then
   echo "Parando contenedor grafana..."
-  docker stop grafana 2>/dev/null
-  docker rm grafana 2>/dev/null
+  podman stop grafana 2>/dev/null
+  podman rm grafana 2>/dev/null
 fi
 
 echo "Eliminando volumen $VOLUME..."
-docker volume rm $VOLUME
+podman volume rm $VOLUME
 
 if [ $? -eq 0 ]; then
   echo "✅ Volumen $VOLUME eliminado correctamente"

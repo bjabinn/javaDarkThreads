@@ -1,6 +1,6 @@
-# Manual: Ejecutar Servicios sin Docker Compose
+# Manual: Ejecutar servicios con Podman
 
-Este documento explica cómo construir y ejecutar Prometheus y Grafana manualmente, sin `docker-compose`. Con Podman, el comando `docker` funciona igual mediante el paquete `podman-docker`.
+Este documento explica cómo construir y ejecutar Prometheus y Grafana con Podman, sin compose.
 
 ## Uso rápido con scripts
 
@@ -20,45 +20,45 @@ Scripts individuales: `01-create-network.sh`, `04-build-prometheus.sh`, `05-buil
 ### 1. Red
 
 ```bash
-docker network create app-network
+podman network create app-network
 ```
 
 ### 2. Prometheus
 
 ```bash
-cd prometheus && docker build -t poc-prometheus:latest . && cd ..
-docker run -d --name prometheus --network app-network -p 9090:9090 --restart unless-stopped poc-prometheus:latest
+cd prometheus && podman build -t poc-prometheus:latest . && cd ..
+podman run -d --name prometheus --network app-network -p 9090:9090 --restart unless-stopped poc-prometheus:latest
 ```
 
-Verificar: `docker logs prometheus` y http://localhost:9090/targets
+Verificar: `podman logs prometheus` y http://localhost:9090/targets
 
 ### 3. Grafana
 
 ```bash
-cd grafana && docker build -t poc-grafana:latest . && cd ..
-docker run -d --name grafana --network app-network -p 3000:3000 --restart unless-stopped poc-grafana:latest
+cd grafana && podman build -t poc-grafana:latest . && cd ..
+podman run -d --name grafana --network app-network -p 3000:3000 --restart unless-stopped poc-grafana:latest
 ```
 
-Verificar: `docker logs grafana` y http://localhost:3000 (admin / admin)
+Verificar: `podman logs grafana` y http://localhost:3000 (admin / admin)
 
 ## Gestión de servicios
 
 ```bash
-docker ps -a                       # estado
-docker logs -f prometheus          # logs en tiempo real
-docker restart prometheus grafana  # reiniciar
-docker stop prometheus grafana     # parar
-docker rm -f prometheus grafana    # eliminar contenedores
-docker rmi poc-prometheus poc-grafana
-docker network rm app-network
-docker stats                       # CPU y memoria
+podman ps -a                       # estado
+podman logs -f prometheus          # logs en tiempo real
+podman restart prometheus grafana  # reiniciar
+podman stop prometheus grafana     # parar
+podman rm -f prometheus grafana    # eliminar contenedores
+podman rmi poc-prometheus poc-grafana
+podman network rm app-network
+podman stats                       # CPU y memoria
 ```
 
 ## Troubleshooting
 
-- **El contenedor no arranca:** `docker logs <nombre>` y `docker inspect <nombre>`.
+- **El contenedor no arranca:** `podman logs <nombre>` y `podman inspect <nombre>`.
 - **Puerto en uso:** `ss -ltnp | grep 9090` (o 3000) y detener el proceso.
-- **La red no existe:** `docker network create app-network`.
+- **La red no existe:** `podman network create app-network`.
 
 ## Notas
 

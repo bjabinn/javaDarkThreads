@@ -76,20 +76,20 @@ java -jar target/platform-threads-poc-0.0.1-SNAPSHOT.jar
 
 La aplicación estará disponible en: http://localhost:8080
 
-## 🐳 Ejecución con Docker
+## 🐳 Ejecución con Podman
 
 ```bash
 # Construir imagen
-docker build -t poc-java-platform-threads:latest .
+podman build -t poc-java-platform-threads:latest .
 
 # Ejecutar contenedor
-docker run -d \
+podman run -d \
   --name java-platform-app \
   -p 8080:8080 \
   poc-java-platform-threads:latest
 
 # Ver logs
-docker logs -f java-platform-app
+podman logs -f java-platform-app
 ```
 
 ## 📊 Métricas Disponibles

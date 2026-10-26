@@ -87,7 +87,7 @@ Arranca primero el servidor y luego el cliente generador de carga de cada modelo
 
 ---
 
-## Infraestructura (Docker)
+## Infraestructura (Podman)
 
 | Servicio | Puerto | URL | Credenciales | Descripción |
 | --- | --- | --- | --- | --- |
@@ -99,7 +99,7 @@ Arranca primero el servidor y luego el cliente generador de carga de cada modelo
 Todos los scripts están en el directorio `scripts/`:
 
 ```bash
-# 1. Construir imágenes Docker (Prometheus + Grafana)
+# 1. Construir imágenes (Prometheus + Grafana)
 ./scripts/build-containers.sh
 
 # 2. Arrancar la infraestructura (red + Prometheus + Grafana)
@@ -238,10 +238,10 @@ open http://localhost:9090/targets
 
 ### Reconstruir Grafana tras cambiar dashboards
 ```bash
-docker compose up --build grafana -d
+./scripts/05-build-grafana.sh && ./scripts/13-run-grafana.sh
 ```
 
 ### Reconstruir Prometheus tras cambiar prometheus.yml
 ```bash
-docker compose restart prometheus
+./scripts/04-build-prometheus.sh && ./scripts/12-run-prometheus.sh
 ```
