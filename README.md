@@ -112,6 +112,40 @@ Todos los scripts están en el directorio `scripts/`:
 ./scripts/stop-containers.sh
 ```
 
+> Para preparar el equipo (WSL2, VS Code, Podman, JDK) consulta [GUIA-ENTORNO-DESARROLLO.md](GUIA-ENTORNO-DESARROLLO.md).
+
+### Ejecución manual con Podman
+
+Equivale a lo que hacen los scripts. La red `app-network` es necesaria: Grafana accede a Prometheus por el nombre `prometheus`, y la red por defecto de Podman no resuelve nombres.
+
+```bash
+# Red
+podman network create app-network
+
+# Prometheus
+cd prometheus && podman build -t poc-prometheus:latest . && cd ..
+podman run -d --name prometheus --network app-network -p 9090:9090 --restart unless-stopped poc-prometheus:latest
+
+# Grafana
+cd grafana && podman build -t poc-grafana:latest . && cd ..
+podman run -d --name grafana --network app-network -p 3000:3000 --restart unless-stopped poc-grafana:latest
+```
+
+Gestión de los contenedores:
+
+```bash
+podman ps -a                       # estado
+podman logs -f prometheus          # logs en tiempo real
+podman restart prometheus grafana  # reiniciar
+podman stop prometheus grafana     # parar
+podman rm -f prometheus grafana    # eliminar contenedores
+podman rmi poc-prometheus poc-grafana
+podman network rm app-network
+podman stats                       # CPU y memoria
+```
+
+Notas: los datos de Prometheus no persisten al eliminar el contenedor (PoC); Grafana usa el volumen `grafana-data` si se arranca con `13-run-grafana.sh`. Los puertos 9090 y 3000 deben estar libres (`ss -ltnp | grep 9090`).
+
 
 ---
 

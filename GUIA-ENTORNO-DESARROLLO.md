@@ -1,4 +1,4 @@
-# Guía de preración de entorno de desarrollo – JavaDarkThreads
+# Guía de preparación de entorno de desarrollo – JavaDarkThreads
 
 26 oct 2026
 
@@ -65,7 +65,9 @@ dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /nores
 ```
 
 # 3. Reiniciar el equipo
+```Powershell
 Restart-Computer
+```
 
 # 4. Tras el reinicio: actualizar WSL, fijar WSL2 e instalar Fedora
 ```Powershell
@@ -171,10 +173,9 @@ Para parar la infraestructura: `./scripts/stop-containers.sh`.
 | --- | --- | --- |
 | `bad interpreter: /bin/bash^M` al ejecutar un `.sh` | Saltos de línea CRLF | `dos2unix` (sección 4, paso 5) |
 | `Permission denied` al lanzar `./run.sh` o `./mvnw` | Falta bit de ejecución | `chmod +x` (sección 4, paso 5) |
-| Maven muy lento o ficheros bloqueados | Repositorio en `/mnt/c` u OneDrive | Clonar en `~/dev` dentro de WSL |
+| Maven muy lento o ficheros bloqueados | Repositorio en `/mnt/c` u OneDrive | Clonar el repositorio en el sistema de ficheros de WSL (por ejemplo `~/dev`), no en `/mnt/c` |
 | Jobs DOWN en Prometheus | `host.docker.internal` no resuelve en Podman | Ajuste de la sección 5 |
 | Container Tools no lista contenedores | Socket de Podman inactivo | `systemctl --user enable --now podman.socket` |
 | `systemctl --user` falla | systemd desactivado en la distro | Añadir `[boot]` con `systemd=true` en `/etc/wsl.conf` y ejecutar `wsl --shutdown` |
 | Puerto en uso (8080, 9090, 3000…) | Otro proceso local | `ss -ltnp \| grep <puerto>` y detenerlo |
 | `Hyper-V`/`WSL` no arranca | Virtualización desactivada | Activar VT-x/SVM en BIOS; consultar a Soporte IT |
-| WSL consume demasiada RAM | Sin límite configurado | `.wslconfig` (sección 5, punto 5) |
