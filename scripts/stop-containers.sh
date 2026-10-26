@@ -2,10 +2,10 @@
 
 # Script para parar y eliminar servicios
 # Uso: ./stop-containers.sh [container1 container2 ...]
-#   Sin argumentos: para todos los contenedores (prometheus grafana postgres kafka)
+#   Sin argumentos: para todos los contenedores (prometheus grafana)
 #   Con argumentos: para solo los contenedores indicados
 
-ALL_CONTAINERS="prometheus grafana postgres kafka"
+ALL_CONTAINERS="prometheus grafana"
 
 if [ $# -eq 0 ]; then
   TARGETS=$ALL_CONTAINERS
@@ -26,7 +26,7 @@ echo ""
 echo "✅ Contenedores parados y eliminados: $TARGETS"
 echo ""
 echo "Para eliminar también las imágenes:"
-echo "  docker rmi poc-prometheus poc-grafana poc-postgres poc-kafka"
+echo "  docker rmi poc-prometheus poc-grafana"
 echo ""
 echo "Para eliminar también la red:"
 echo "  docker network rm app-network"

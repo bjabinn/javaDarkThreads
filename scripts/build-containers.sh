@@ -13,12 +13,6 @@ echo ""
 "$SCRIPT_DIR/01-create-network.sh"
 echo ""
 
-# "$SCRIPT_DIR/02-build-postgres.sh"
-# echo ""
-
-# "$SCRIPT_DIR/03-build-kafka.sh"
-# echo ""
-
 "$SCRIPT_DIR/04-build-prometheus.sh"
 echo ""
 

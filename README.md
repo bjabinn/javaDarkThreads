@@ -93,8 +93,6 @@ Arranca primero el servidor y luego el cliente generador de carga de cada modelo
 | --- | --- | --- | --- | --- |
 | Prometheus | 9090 | http://localhost:9090 | — | Scraping de métricas (1s por app Java) |
 | Grafana | 3000 | http://localhost:3000 | admin / admin | Dashboards de visualización |
-| PostgreSQL | 5432 | localhost:5432 | postgres / postgres | Base de datos relacional |
-| Kafka | 9092 | localhost:9092 | — | Message broker (modo KRaft, sin Zookeeper) |
 
 ### Scripts disponibles
 
@@ -114,7 +112,6 @@ Todos los scripts están en el directorio `scripts/`:
 ./scripts/stop-containers.sh
 ```
 
-> PostgreSQL y Kafka están disponibles pero comentados en `start-containers.sh`. Descoméntalos si los necesitas.
 
 ---
 

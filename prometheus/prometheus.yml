@@ -80,13 +80,3 @@ scrape_configs:
           service: 'web-server-vt'
     metrics_path: '/actuator/prometheus'
     scrape_interval: 1s
-
-  # PostgreSQL (si usas postgres_exporter)
-  # - job_name: 'postgres'
-  #   static_configs:
-  #     - targets: ['postgres-exporter:9187']
-
-  # Kafka JMX Exporter (si decides agregarlo)
-  # - job_name: 'kafka'
-  #   static_configs:
-  #     - targets: ['kafka-exporter:9308']

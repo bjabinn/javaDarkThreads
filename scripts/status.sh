@@ -8,7 +8,7 @@ echo ""
 
 # Verificar contenedores
 echo "🐳 Contenedores:"
-docker ps -a --filter "name=postgres" --filter "name=kafka" --filter "name=prometheus" --filter "name=grafana" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+docker ps -a --filter "name=prometheus" --filter "name=grafana" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 
 echo ""
 echo "================================================"

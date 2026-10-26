@@ -20,12 +20,6 @@ echo ""
 "$SCRIPT_DIR/13-run-grafana.sh"
 echo ""
 
-# Opcional: PostgreSQL y Kafka (descomentados si los necesitas)
-# "$SCRIPT_DIR/10-run-postgres.sh"
-# echo ""
-# "$SCRIPT_DIR/11-run-kafka.sh"
-# echo ""
-
 echo "================================================"
 echo "✅ ¡Todos los servicios están corriendo!"
 echo ""
